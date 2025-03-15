@@ -1,0 +1,90 @@
+/* Merged CSS file: static/css/styles.css */
+
+/* General Styles */
+body {
+    background-color: #f8f9fa; /* Light gray background */
+    padding-top: 70px; /* Extra space for fixed navbar */
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Ensure full viewport height */
+}
+
+/* Headings */
+h1, h2 {
+    font-family: Arial, sans-serif;
+}
+
+/* Card Styling */
+.card {
+    border: 1px solid #ccc;
+    border-radius: 10px; /* Rounded corners */
+    overflow: hidden;
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: scale(1.02); /* Slight zoom effect */
+}
+
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+
+/* Navbar */
+.navbar-brand {
+    font-weight: bold;
+}
+
+.navbar-nav .nav-link {
+    font-size: 1rem;
+    padding: 10px;
+}
+
+/* Footer */
+footer {
+    background-color: #343a40; /* Dark footer */
+    color: white;
+    text-align: center;
+    padding: 15px;
+    margin-top: auto;
+    width: 100%;
+}
+
+/* Mobile-friendly adjustments */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+    
+    .nav-link {
+        font-size: 0.9rem;
+    }
+
+    .card-img-top {
+        height: 150px; /* Reduce image height for mobile */
+    }
+
+    .container {
+        padding: 10px; /* Reduce padding for smaller screens */
+    }
+}
+
+@media (max-width: 576px) {
+    body {
+        font-size: 1rem;
+    }
+
+    .navbar-nav {
+        text-align: center;
+    }
+
+    .navbar-toggler {
+        margin-left: auto;
+    }
+
+    footer {
+        font-size: 0.9rem;
+    }
+}

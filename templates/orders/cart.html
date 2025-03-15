@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+
+{% block title %}Your Cart{% endblock %}
+{% block content %}
+  <h1>Your Cart</h1>
+  {% if cart %}
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th>Quantity</th>
+        <th>Price</th>
+        <th>Subtotal</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item_id, item in cart.items %}
+      <tr>
+        <td>{{ item.name }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>${{ item.price }}</td>
+        <td>${{ item.quantity|multiply:item.price }}</td>
+
+      </tr>
+      {% endfor %}
+      <tr>
+        <td colspan="3" class="text-end"><strong>Total:</strong></td>
+        <td><strong>${{ total }}</strong></td>
+      </tr>
+    </tbody>
+  </table>
+  <a href="{% url 'checkout' %}" class="btn btn-success">Proceed to Checkout</a>
+  {% else %}
+    <p>Your cart is empty.</p>
+  {% endif %}
+{% endblock %}
