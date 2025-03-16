@@ -1,5 +1,4 @@
-{% load static %}  
-
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,17 +21,39 @@
               aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
          <span class="navbar-toggler-icon"></span>
       </button>
+      
       <div class="collapse navbar-collapse" id="navbarNav">
          <ul class="navbar-nav ms-auto">
-            <li class="nav-item"><a class="nav-link" href="{% url 'menu' %}">Menu</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'view_cart' %}">Cart</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+            <!-- Always visible links -->
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'menu' %}">Menu</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'view_cart' %}">Cart</a>
+            </li>
+
+            <!-- Conditional: if user is authenticated -->
+            {% if user.is_authenticated %}
+              <!-- Conditional: if user is staff, show Manage Orders link -->
+              {% if user.is_staff %}
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'manage_orders' %}">Manage Orders</a>
+              </li>
+              {% endif %}
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+              </li>
+            {% else %}
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'login' %}">Login</a>
+              </li>
+            {% endif %}
          </ul>
       </div>
     </div>
   </nav>
 
-  <!-- Main Content -->
+  <!-- Main Content (add spacing for fixed-top nav) -->
   <div class="container my-5 pt-5">
     {% block content %}{% endblock %}
   </div>

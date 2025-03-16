@@ -1,38 +1,56 @@
 {% extends 'base.html' %}
 {% load custom_filters %}
 
-
 {% block title %}Your Cart{% endblock %}
 {% block content %}
-  <h1>Your Cart</h1>
-  {% if cart %}
+<h1>Your Cart</h1>
+{% if cart %}
   <table class="table table-striped">
     <thead>
       <tr>
         <th>Item</th>
-        <th>Quantity</th>
+        <th style="width: 200px;">Quantity</th>
         <th>Price</th>
         <th>Subtotal</th>
+        <th>Action</th>
       </tr>
     </thead>
     <tbody>
       {% for item_id, item in cart.items %}
       <tr>
         <td>{{ item.name }}</td>
-        <td>{{ item.quantity }}</td>
-        <td>${{ item.price }}</td>
-        <td>${{ item.quantity|multiply:item.price }}</td>
-
+        
+        <!-- Quantity + / - Buttons -->
+        <td>
+          <div class="d-flex align-items-center">
+            <a href="{% url 'decrement_cart_item' item_id=item_id %}" class="btn btn-sm btn-danger me-2">-</a>
+            <span>{{ item.quantity }}</span>
+            <a href="{% url 'increment_cart_item' item_id=item_id %}" class="btn btn-sm btn-success ms-2">+</a>
+          </div>
+        </td>
+        
+        <td>Tsh{{ item.price }}</td>
+        <td>Tsh{{ item.quantity|multiply:item.price }}</td>
+        
+        <!-- Remove Button -->
+        <td>
+          <a 
+            href="{% url 'remove_from_cart' item_id=item_id %}" 
+            class="btn btn-sm btn-outline-danger"
+          >
+            Remove
+          </a>
+        </td>
       </tr>
       {% endfor %}
       <tr>
         <td colspan="3" class="text-end"><strong>Total:</strong></td>
-        <td><strong>${{ total }}</strong></td>
+        <td colspan="2"><strong>Tsh{{ total }}</strong></td>
       </tr>
     </tbody>
   </table>
   <a href="{% url 'checkout' %}" class="btn btn-success">Proceed to Checkout</a>
-  {% else %}
-    <p>Your cart is empty.</p>
-  {% endif %}
+{% else %}
+  <p>Your cart is empty.</p>
+{% endif %}
 {% endblock %}

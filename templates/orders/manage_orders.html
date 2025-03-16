@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Manage Orders{% endblock %}
+{% block content %}
+<div class="container">
+  <h1>All Orders</h1>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Order ID</th>
+        <th>User</th>
+        <th>Phone Number</th>
+        <th>Email</th>
+        <th>Status</th>
+        <th>Created</th>
+        <th>Total Price</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for order in orders %}
+      <tr>
+        <td>{{ order.id }}</td>
+        <td>{{ order.user.username }}</td>
+        <td>
+          {% if order.user.profile %}
+            {{ order.user.profile.phone_number }}
+          {% else %}
+            -
+          {% endif %}
+        </td>
+        <td>{{ order.user.email }}</td>
+        <td>{{ order.status }}</td>
+        <td>{{ order.created_at }}</td>
+        <td>Tsh {{ order.total_price }}</td>
+        <td>
+          <a href="{% url 'update_order_status' order.id 'in_progress' %}" class="btn btn-warning btn-sm">
+            In Progress
+          </a>
+          <a href="{% url 'update_order_status' order.id 'completed' %}" class="btn btn-success btn-sm">
+            Complete
+          </a>
+          <a href="{% url 'update_order_status' order.id 'cancelled' %}" class="btn btn-danger btn-sm">
+            Cancel
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

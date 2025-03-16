@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-import os
+import os 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,7 +23,8 @@ SECRET_KEY = 'django-insecure-$dlyy%#*q-76h=)3qntztl3et2!&7$mx_3e1zm+-=(6ieuo7#=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# Updated ALLOWED_HOSTS to support ngrok
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.ngrok.io']
 
 # Application definition
 INSTALLED_APPS = [
@@ -33,10 +34,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'accounts',  # For user management
+    'accounts.apps.AccountsConfig',
+  # For user management
     'menu',      # For the food menu
     'orders',    # For order processing and tracking
     'mathfilters',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -54,7 +57,8 @@ ROOT_URLCONF = 'hotel_ordering.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # Updated to include 'templates' directory
+        # Updated to include 'templates' directory
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -99,7 +103,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Dar_es_Salaam'
 
 USE_I18N = True
 
@@ -123,3 +127,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STRIPE_PUBLIC_KEY = 'your-public-key'
 STRIPE_SECRET_KEY = 'your-secret-key'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        # or 'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+}
