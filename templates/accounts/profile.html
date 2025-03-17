@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h1>Your Profile</h1>
+  <hr>
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-info">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <h4>User Info</h4>
+        {{ user_form.email.label_tag }}
+        {{ user_form.email }}
+      </div>
+      <div class="col-md-6 mb-3">
+        <h4>Profile Info</h4>
+        {{ profile_form.phone_number.label_tag }}
+        {{ profile_form.phone_number }}
+
+        <br><br>
+        {{ profile_form.profile_picture.label_tag }}
+        {{ profile_form.profile_picture }}
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Update Profile</button>
+  </form>
+
+  <hr>
+  <h4>Current Profile Picture</h4>
+  {% if user.profile.profile_picture %}
+    <img src="{{ user.profile.profile_picture.url }}" alt="Profile" width="150">
+  {% else %}
+    <p>No profile picture yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

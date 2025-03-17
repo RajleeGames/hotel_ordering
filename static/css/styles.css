@@ -147,7 +147,6 @@ footer {
         transform: translateX(-50%);
         opacity: 0;
     }
-
     100% {
         transform: translateX(0);
         opacity: 1;
@@ -164,7 +163,6 @@ form {
         opacity: 0;
         transform: translateY(20px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
@@ -221,12 +219,10 @@ form {
 
 /* Neon Glow Animation for Buttons */
 @keyframes neonGlow {
-
     0%,
     100% {
         text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px var(--primary-color), 0 0 20px var(--primary-color), 0 0 25px var(--primary-color);
     }
-
     50% {
         text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px var(--primary-color), 0 0 40px var(--primary-color), 0 0 50px var(--primary-color);
     }

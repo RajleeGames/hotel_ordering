@@ -32,18 +32,39 @@
               <a class="nav-link" href="{% url 'view_cart' %}">Cart</a>
             </li>
 
-            <!-- Conditional: if user is authenticated -->
+            <!-- If user is authenticated, show profile dropdown -->
             {% if user.is_authenticated %}
-              <!-- Conditional: if user is staff, show Manage Orders link -->
-              {% if user.is_staff %}
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'manage_orders' %}">Manage Orders</a>
-              </li>
-              {% endif %}
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarProfileDropdown" role="button"
+                   data-bs-toggle="dropdown" aria-expanded="false">
+                  {% if user.profile.profile_picture %}
+                    <img src="{{ user.profile.profile_picture.url }}" alt="Profile"
+                         style="width: 30px; height: 30px; border-radius: 50%; margin-right: 5px;">
+                  {% else %}
+                    <!-- Fallback icon (requires Bootstrap Icons or Font Awesome) -->
+                    <i class="bi bi-person-circle" style="font-size: 1.2rem; margin-right: 5px;"></i>
+                  {% endif %}
+                  {{ user.username }}
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarProfileDropdown">
+                  <li>
+                    <a class="dropdown-item" href="{% url 'profile' %}">
+                      Profile
+                    </a>
+                  </li>
+                  {% if user.is_staff %}
+                  <li>
+                    <a class="dropdown-item" href="{% url 'manage_orders' %}">Manage Orders</a>
+                  </li>
+                  {% endif %}
+                  <li><hr class="dropdown-divider"></li>
+                  <li>
+                    <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+                  </li>
+                </ul>
               </li>
             {% else %}
+              <!-- If user not logged in, show Login link -->
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'login' %}">Login</a>
               </li>

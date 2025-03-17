@@ -4,9 +4,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
-
+from datetime import date, timedelta
+from .models import Order
 import stripe
-
 from menu.models import FoodItem
 from .models import Order, OrderItem, Coupon
 
@@ -187,11 +187,24 @@ def order_confirmation(request, order_id):
 
 @staff_member_required
 def manage_orders(request):
-    """
-    Staff-only view to manage orders.
-    """
-    orders = Order.objects.all().order_by('-created_at')
-    return render(request, 'orders/manage_orders.html', {'orders': orders})
+    # Grab the 'date_filter' from GET parameters
+    date_filter = request.GET.get('date_filter', '')
+    orders = Order.objects.all()
+
+    # Apply filter logic based on selected option
+    if date_filter == 'today':
+        orders = orders.filter(created_at__date=date.today())
+    elif date_filter == 'yesterday':
+        orders = orders.filter(created_at__date=date.today() - timedelta(days=1))
+    elif date_filter == 'last_7_days':
+        start_date = date.today() - timedelta(days=7)
+        orders = orders.filter(created_at__date__gte=start_date)
+
+    context = {
+        'orders': orders,
+    }
+    return render(request, 'orders/manage_orders.html', context)
+
 
 
 @staff_member_required
