@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .views import order_status_api, track_order  # Import both order_status_api and track_order
 
 urlpatterns = [
     path('add/<int:item_id>/', views.add_to_cart, name='add_to_cart'),
@@ -7,6 +8,8 @@ urlpatterns = [
     path('checkout/', views.checkout, name='checkout'),
     path('payment/', views.process_payment, name='process_payment'),
     path('order_confirmation/<int:order_id>/', views.order_confirmation, name='order_confirmation'),
+    path('status/<int:order_id>/', order_status_api, name='order_status_api'),
+    path('track/<int:order_id>/', track_order, name='track_order'),
     
     # New Cart Update URLs
     path('increment/<int:item_id>/', views.increment_cart_item, name='increment_cart_item'),

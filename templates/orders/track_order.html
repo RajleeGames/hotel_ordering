@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Track Your Order
+{% endblock title %}
+
+{% block content %}
+<style>
+  @media (max-width: 576px) {
+    #map {
+      height: 300px;
+    }
+  }
+</style>
+
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-body text-center">
+          <h1 class="card-title mb-4">Order #{{ order.id }} Tracking</h1>
+          
+          <p class="card-text mb-1">
+            <strong>Status:</strong> 
+            <span id="order-status">{{ order.status }}</span>
+          </p>
+          
+          <p class="card-text mb-3">
+            <strong>Total Price:</strong> 
+            $<span id="order-price">{{ order.total_price }}</span>
+          </p>
+
+          <!-- Responsive Map Container -->
+          <div id="map" class="rounded border" style="width: 100%; height: 400px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block extra_scripts %}
+<!-- Replace with your actual API key -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD2DjhC1TK5fP73C-Nv8OTtwJWubK3dH9I"></script>
+
+<script>
+  let map;
+  let marker;
+  let prevStatus = "{{ order.status }}";
+
+  // Request permission for browser notifications
+  if ("Notification" in window) {
+    Notification.requestPermission().then(permission => {
+      console.log("Notification permission:", permission);
+      // Uncomment below to force test notification after permission is granted
+      // if (permission === "granted") showOrderNotification("Test Status");
+    });
+  }
+
+  // Initialize the map with a default location (default: 0,0)
+  function initMap(lat = 0, lng = 0) {
+    const center = { lat: lat, lng: lng };
+    map = new google.maps.Map(document.getElementById("map"), {
+      center: center,
+      zoom: 14,
+    });
+    marker = new google.maps.Marker({
+      position: center,
+      map: map,
+    });
+  }
+
+  // Update the marker’s position on the map
+  function updateMap(lat, lng) {
+    const newPos = { lat: lat, lng: lng };
+    marker.setPosition(newPos);
+    map.setCenter(newPos);
+  }
+
+  // Show a notification with an icon and an in-page alert
+  function showOrderNotification(newStatus) {
+    console.log("Attempting to show notification for status:", newStatus);
+    // Basic in-page alert for demonstration
+    alert(`Your order status changed to: ${newStatus}`);
+
+    // HTML5 browser notification with a custom icon
+    if ("Notification" in window && Notification.permission === "granted") {
+      new Notification("Order Update", {
+        body: `Your order is now: ${newStatus}`,
+        icon: "/static/images/notification_icon.png" // Ensure this path is correct
+      });
+    } else {
+      console.warn("Notification not permitted or unsupported.");
+    }
+  }
+
+  // Poll the server for order updates
+  function fetchOrderStatus() {
+    fetch("{% url 'order_status_api' order.id %}")
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          console.error("Error fetching order status:", data.error);
+          return;
+        }
+        // Update status text and price
+        document.getElementById("order-status").textContent = data.status;
+        document.getElementById("order-price").textContent = data.total_price.toFixed(2);
+
+        // If status changed, show notification
+        if (data.status !== prevStatus) {
+          showOrderNotification(data.status);
+          prevStatus = data.status;
+        }
+
+        // Update map if driver coordinates are available
+        if (data.driver_lat && data.driver_lng) {
+          updateMap(data.driver_lat, data.driver_lng);
+        }
+      })
+      .catch(error => console.error("Error:", error));
+  }
+
+  // Initialize the map
+  initMap();
+
+  // Fetch the latest order status immediately on load
+  fetchOrderStatus();
+
+  // Poll for order updates every 15 seconds
+  setInterval(fetchOrderStatus, 15000);
+</script>
+{% endblock extra_scripts %}

@@ -9,6 +9,8 @@ from .models import Order
 import stripe
 from menu.models import FoodItem
 from .models import Order, OrderItem, Coupon
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -216,3 +218,37 @@ def update_order_status(request, order_id, new_status):
     order.status = new_status
     order.save()
     return redirect('manage_orders')
+
+
+
+
+@login_required
+def order_status_api(request, order_id):
+    """
+    Returns JSON with the order status and driver location.
+    Only accessible to the user who placed the order (or staff).
+    """
+    # Restrict to the user’s own order (or staff/superuser).
+    if request.user.is_staff:
+        order = get_object_or_404(Order, pk=order_id)
+    else:
+        order = get_object_or_404(Order, pk=order_id, user=request.user)
+
+    data = {
+        'status': order.status,
+        'driver_lat': float(order.driver_lat) if order.driver_lat else None,
+        'driver_lng': float(order.driver_lng) if order.driver_lng else None,
+        'total_price': float(order.total_price) if order.total_price else 0.0
+    }
+    return JsonResponse(data)
+
+
+
+def track_order(request, order_id):
+    # Restrict to user’s own order or staff
+    if request.user.is_staff:
+        order = get_object_or_404(Order, pk=order_id)
+    else:
+        order = get_object_or_404(Order, pk=order_id, user=request.user)
+
+    return render(request, 'orders/track_order.html', {'order': order})
