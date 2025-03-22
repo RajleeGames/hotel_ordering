@@ -476,3 +476,34 @@ form {
         white-space: nowrap;
     }
 }
+
+
+  /* Example: Force the "Good morning" to be bold and larger if you want */
+.offcanvas-header h6 {
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+  
+  /* Example: Make the arrow icon slightly bigger or add spacing */
+  .offcanvas-header .fa-arrow-left {
+    margin-right: 10px;
+  }
+  
+  /* Example: Adjust the login button style */
+  .offcanvas-header .btn-outline-light {
+    border: 2px solid #fff;
+    font-weight: 600;
+  }
+  
+  /* You can also style the brand name in the navbar */
+  .navbar-brand {
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+  
+  @media (max-width: 991px) {
+    #sidebarMenu.offcanvas-partial {
+      width: 90% !important;
+    }
+  }
+  

@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}Hotel Ordering{% endblock %}</title>
+  <title>{% block title %}Quickdrop{% endblock %}</title>
   
   <!-- Bootstrap CSS via CDN -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -12,103 +12,226 @@
   <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   
-  <!-- Animate.css for animations -->
+  <!-- Animate.css (optional) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   
   <!-- Custom CSS -->
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
   
+  <style>
+    /* Offcanvas: 80% width on small screens, up to 350px on large, centered horizontally.
+       Flat left edge, rounded on top/right/bottom. */
+    .offcanvas-custom {
+      width: 80% !important;
+      max-width: 350px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 0 20px 20px 20px;
+    }
+    @media (min-width: 992px) {
+      .offcanvas-custom {
+        width: 320px !important;
+      }
+    }
+
+    /* Offcanvas header (orange background, no "Good morning") */
+    .offcanvas-header {
+      background-color: #FF6600;
+      color: #fff;
+      padding: 2rem 1rem;
+      border-top-right-radius: 20px;
+      border-bottom-right-radius: 20px;
+      position: relative;
+      text-align: center;
+    }
+    /* Close arrow at top-left inside the sidebar */
+    .sidebar-close-arrow {
+      position: absolute;
+      top: 10px;
+      left: 15px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #fff;
+    }
+
+    /* White navbar at the top, no extra space above */
+    .navbar {
+      background-color: #fff !important;
+      border-bottom: 1px solid #eee;
+      margin: 0;
+      padding: 0.5rem 1rem;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1030;
+    }
+    /* Brand name in orange, bigger/bolder font */
+    .navbar-brand {
+      color: #FF6600 !important;
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-left: 0.5rem;
+    }
+    /* Login link also in orange, with an icon */
+    .navbar .nav-link {
+      color: #FF6600 !important;
+      font-weight: 600;
+    }
+    .navbar .nav-link i {
+      margin-right: 4px;
+    }
+
+    /* Body offset for the fixed navbar (so content isn't hidden behind it) */
+    body {
+      margin: 0;
+      padding-top: 60px; /* Adjust if you want more/less space under the navbar */
+    }
+  </style>
 </head>
-<body>
-  <!-- Navigation Bar -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-    <div class="container">
-      <a class="navbar-brand" href="{% url 'menu' %}">Hotel Ordering</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-         <span class="navbar-toggler-icon"></span>
-      </button>
-      
-      <div class="collapse navbar-collapse" id="navbarNav">
-         <ul class="navbar-nav ms-auto">
-            <!-- Always visible links -->
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'menu' %}">Menu</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'view_cart' %}">Cart</a>
-            </li>
-            
-            <!-- Notification Icon -->
-            <li class="nav-item">
-              <a class="nav-link" href="#" onclick="testNotification(); return false;">
-                <i class="bi bi-bell" style="font-size: 1.2rem;"></i>
-                <span id="notificationCount" class="badge bg-danger">0</span>
-              </a>
-            </li>
- 
-            <!-- If user is authenticated, show profile dropdown -->
-            {% if user.is_authenticated %}
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarProfileDropdown" role="button"
-                   data-bs-toggle="dropdown" aria-expanded="false">
-                  {% if user.profile.profile_picture %}
-                    <img src="{{ user.profile.profile_picture.url }}" alt="Profile"
-                         style="width: 30px; height: 30px; border-radius: 50%; margin-right: 5px;">
-                  {% else %}
-                    <i class="bi bi-person-circle" style="font-size: 1.2rem; margin-right: 5px;"></i>
-                  {% endif %}
-                  {{ user.username }}
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarProfileDropdown">
-                  <li>
-                    <a class="dropdown-item" href="{% url 'profile' %}">Profile</a>
-                  </li>
-                  {% if user.is_staff %}
-                  <li>
-                    <a class="dropdown-item" href="{% url 'manage_orders' %}">Manage Orders</a>
-                  </li>
-                  {% endif %}
-                  <li><hr class="dropdown-divider"></li>
-                  <li>
-                    <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
-                  </li>
-                </ul>
-              </li>
-            {% else %}
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'login' %}">Login</a>
-              </li>
-            {% endif %}
-         </ul>
+<body class="bg-light">
+
+  <!-- TOP NAVBAR -->
+  <nav class="navbar navbar-expand d-flex align-items-center">
+    <div class="container-fluid d-flex align-items-center justify-content-between">
+      <!-- Hamburger + Brand on left -->
+      <div class="d-flex align-items-center">
+        <button class="btn btn-link text-orange p-0 me-2" 
+                type="button" 
+                data-bs-toggle="offcanvas" 
+                data-bs-target="#sidebarMenu" 
+                aria-controls="sidebarMenu"
+                style="color: #FF6600; font-size: 1.5rem;">
+          <i class="fas fa-bars"></i>
+        </button>
+        <a class="navbar-brand" href="{% url 'menu' %}">Quickdrop</a>
       </div>
+
+      <!-- Right side: Login or user info -->
+      <ul class="navbar-nav ms-auto">
+        {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'profile' %}">
+              <i class="fa fa-user-circle"></i> {{ user.username }}
+            </a>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'login' %}">
+              <i class="fa fa-user-circle"></i>Login
+            </a>
+          </li>
+        {% endif %}
+      </ul>
     </div>
   </nav>
-
-  <!-- Main Content (with spacing for fixed-top nav) -->
-  <div class="container my-5 pt-5">
+  
+  <!-- OFFCANVAS SIDEBAR -->
+  <div class="offcanvas offcanvas-start offcanvas-custom" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+    <!-- SIDEBAR HEADER (no "Good morning") -->
+    <div class="offcanvas-header">
+      <i class="fa fa-arrow-left sidebar-close-arrow" data-bs-dismiss="offcanvas"></i>
+      <h4 class="mb-2 fw-bold" style="font-size: 1.3rem;">Quickdrop</h4>
+      {% if user.is_authenticated %}
+        <div class="text-white">
+          <i class="fa fa-user-circle me-1"></i> {{ user.username }}
+        </div>
+      {% else %}
+        <a href="{% url 'login' %}" class="btn btn-outline-light" style="font-weight: 600; border-radius: 30px; padding: 0.4rem 1rem;">
+          <i class="fa fa-user-circle me-1"></i> Login
+        </a>
+      {% endif %}
+    </div>
+    
+    <!-- SIDEBAR BODY -->
+    <div class="offcanvas-body bg-white text-dark">
+      <ul class="list-unstyled">
+        <!-- Menu Link -->
+        <li class="mb-3">
+          <a href="{% url 'menu' %}" class="d-flex align-items-center text-decoration-none text-dark">
+            <i class="fa fa-utensils me-2"></i> Menu
+          </a>
+        </li>
+        <!-- Cart Link -->
+        <li class="mb-3">
+          <a href="{% url 'view_cart' %}" class="d-flex align-items-center text-decoration-none text-dark">
+            <i class="fa fa-shopping-cart me-2"></i> Cart
+          </a>
+        </li>
+        <!-- Notification Icon -->
+        <li class="mb-3">
+          <a href="#" class="d-flex align-items-center text-decoration-none text-dark" onclick="testNotification(); return false;">
+            <i class="bi bi-bell me-2" style="font-size: 1.2rem;"></i> Notifications
+            <span id="notificationCount" class="badge bg-danger ms-2">0</span>
+          </a>
+        </li>
+        <hr>
+        <!-- Change Language -->
+        <li class="mb-3">
+          <a class="d-flex align-items-center text-decoration-none text-dark" data-bs-toggle="collapse" href="#languageCollapse" role="button" aria-expanded="false" aria-controls="languageCollapse">
+            <i class="fa fa-globe me-2"></i> Change Language / English
+          </a>
+          <div class="collapse mt-2" id="languageCollapse">
+            <ul class="list-unstyled ps-4">
+              <li><a href="#" class="text-decoration-none text-dark">Swahili</a></li>
+              <li><a href="#" class="text-decoration-none text-dark">English</a></li>
+            </ul>
+          </div>
+        </li>
+        <!-- Customer Support -->
+        <li class="mb-3">
+          <a href="{% url 'customer_support' %}" class="d-flex align-items-center text-decoration-none text-dark">
+            <i class="fa fa-headset me-2"></i> Customer Support
+          </a>
+        </li>
+        <hr>
+        <!-- Profile / Logout (if authenticated) -->
+        {% if user.is_authenticated %}
+          <li class="mb-3">
+            <a href="{% url 'profile' %}" class="d-flex align-items-center text-decoration-none text-dark">
+              <i class="fa fa-user-cog me-2"></i> Profile
+            </a>
+          </li>
+          {% if user.is_staff %}
+            <li class="mb-3">
+              <a href="{% url 'manage_orders' %}" class="d-flex align-items-center text-decoration-none text-dark">
+                <i class="fa fa-tasks me-2"></i> Manage Orders
+              </a>
+            </li>
+          {% endif %}
+          <li class="mb-3">
+            <a href="{% url 'logout' %}" class="d-flex align-items-center text-decoration-none text-dark">
+              <i class="fa fa-sign-out-alt me-2"></i> Logout
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+  
+  <!-- MAIN CONTENT -->
+  <div class="container my-5 pt-3">
     {% block content %}{% endblock content %}
   </div>
-
-  <!-- Footer -->
-  <footer class="bg-dark text-white text-center py-3 mt-auto">
+  
+  <!-- FOOTER -->
+  <footer class="text-white text-center py-3" style="background-color: #FF6600;">
     <div class="container">
-      <p class="mb-0">&copy; 2025 Hotel Ordering | <a href="#" class="text-white">Privacy Policy</a></p>
+      <p class="mb-0">&copy; 2025 Quickdrop | <a href="#" class="text-white">Privacy Policy</a></p>
     </div>
   </footer>
-
-  <!-- Bootstrap JS Bundle (includes Popper) -->
+  
+  <!-- BOOTSTRAP JS (includes Popper) -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   
-  {% block extra_scripts %}
-  {% endblock extra_scripts %}
+  {% block extra_scripts %}{% endblock extra_scripts %}
   
   <script>
-    // Function to test notifications when the notification icon is clicked.
+    // Example Notification function
     function testNotification() {
-      // Check if the Notification API is available
       if ("Notification" in window) {
-        // Request permission if not already granted
         if (Notification.permission !== "granted") {
           Notification.requestPermission().then(permission => {
             if (permission === "granted") {
@@ -124,18 +247,15 @@
         alert("This browser does not support desktop notifications.");
       }
     }
-
+  
     function createTestNotification() {
-      // Create a test notification with an icon
       new Notification("Test Notification", {
-        body: "This is a test notification from Hotel Ordering.",
+        body: "This is a test notification from Quickdrop.",
         icon: "{% static 'images/notification_icon.png' %}"
       });
-      // For demonstration, update the notification count badge
       let countElem = document.getElementById("notificationCount");
       countElem.textContent = parseInt(countElem.textContent) + 1;
     }
   </script>
-
 </body>
 </html>

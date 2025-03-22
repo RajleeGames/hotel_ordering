@@ -2,8 +2,7 @@
 {% load static %}
 {% block title %}Menu{% endblock %}
 {% block content %}
-<!-- Page Title -->
-<h1 class="mb-4 text-center">Our Menu</h1>
+
 
 <!-- Flash Messages -->
 {% if messages %}
@@ -28,6 +27,12 @@
   </script>
 {% endif %}
 
+<!-- Image Banner (Responsive for Mobile) -->
+<div class="mb-4">
+  <img src="{% static 'images/banner.jpg' %}" class="img-fluid w-100" alt="Delicious Food Banner">
+</div>
+
+
 <!-- Search Form -->
 <form method="GET" action="{% url 'menu' %}" class="row g-3 mb-4">
   <div class="col-md-6">
@@ -45,6 +50,52 @@
     <button type="submit" class="btn btn-primary w-100">Search</button>
   </div>
 </form>
+
+   
+<!-- Mobile Category Buttons (Compact & Horizontally Scrollable) -->
+<div class="mobile-category-buttons mb-4" style="overflow-x: auto; white-space: nowrap;">
+  <a href="?category=for-you" class="btn btn-outline-secondary btn-custom text-center mx-1">
+    <i class="fas fa-thumbs-up"></i><br>
+    <small>For You</small>
+  </a>
+  <a href="?category=favorite" class="btn btn-outline-secondary btn-custom text-center mx-1">
+    <i class="fas fa-heart"></i><br>
+    <small>Fav</small>
+  </a>
+  <a href="?category=food-restaurants" class="btn btn-outline-secondary btn-custom text-center mx-1">
+    <i class="fas fa-utensils"></i><br>
+    <small>Food</small>
+  </a>
+  <a href="?category=grocery" class="btn btn-outline-secondary btn-custom text-center mx-1">
+    <i class="fas fa-shopping-basket"></i><br>
+    <small>Grocery</small>
+  </a>
+  <a href="?category=beverage" class="btn btn-outline-secondary btn-custom text-center mx-1">
+    <i class="fas fa-coffee"></i><br>
+    <small>Beverage</small>
+  </a>
+  <a href="?category=electronics" class="btn btn-outline-secondary btn-custom text-center mx-1">
+    <i class="fas fa-tv"></i><br>
+    <small>Electronics</small>
+  </a>
+</div>
+
+
+<!-- Additional CSS for Compact Button Styling -->
+<style>
+  .btn-custom {
+    padding: 3px 5px;
+    min-width: 70px;
+    font-size: 18px;
+    border-width: 1.5px;
+    line-height: 1.2;
+  }
+  .btn-custom i {
+    font-size: 20px;
+    margin-bottom: 2px;
+  }
+</style>
+
 
 <!-- Track Your Order Link with Fancy Animation -->
 {% if order %}
@@ -64,6 +115,7 @@
   </div>
 {% endif %}
 
+<!-- Food Items Listing -->
 {% if not grouped %}
   <h2 class="mb-3">Search Results</h2>
   <div class="row g-3">
@@ -76,14 +128,12 @@
             {% else %}
               <img src="https://via.placeholder.com/300x200?text=No+Image" class="card-img-top img-fluid rounded-top" alt="{{ item.name }}">
             {% endif %}
-            <!-- Optional badge overlay -->
             <span class="badge bg-primary position-absolute top-0 start-0 m-2">New</span>
           </div>
           <div class="card-body d-flex flex-column">
             <h5 class="card-title">{{ item.name }}</h5>
             <p class="card-text text-muted mb-3">Tsh{{ item.price }}</p>
             <p class="card-text flex-grow-1">{{ item.description|truncatewords:10 }}</p>
-            <!-- Quantity Form -->
             <form method="POST" action="{% url 'add_to_cart' item.id %}">
               {% csrf_token %}
               <div class="input-group mb-2">
@@ -140,7 +190,7 @@
   {% endif %}
   
 {% else %}
-  <!-- Default Grouped by Category (when no filters are active) -->
+  <!-- Grouped by Category (if no filters are active) -->
   {% for category in categories %}
     <div class="mb-5">
       <h2 class="mb-3">{{ category.name }}</h2>

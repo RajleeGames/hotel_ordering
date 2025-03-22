@@ -11,6 +11,7 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     
     
+    
     # NEW: DRF API
     path('api/', include('orders.api_urls')), 
 ]

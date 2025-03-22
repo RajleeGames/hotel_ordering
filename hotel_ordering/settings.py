@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure-$dlyy%#*q-76h=)3qntztl3et2!&7$mx_3e1zm+-=(6ieuo7#=
 DEBUG = True 
 
 # Updated ALLOWED_HOSTS to support ngrok
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'c028-41-78-169-246.ngrok-free.app']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '2446-41-78-170-132.ngrok-free.app']
 
 # Application definition
 INSTALLED_APPS = [
@@ -139,5 +139,5 @@ REST_FRAMEWORK = {
 }
 
 CSRF_TRUSTED_ORIGINS = [
-     "https://c028-41-78-169-246.ngrok-free.app",
+     "https://2446-41-78-170-132.ngrok-free.app",
 ]

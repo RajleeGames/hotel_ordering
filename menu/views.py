@@ -43,3 +43,7 @@ def menu_view(request):
         'order': order,  # Pass the order object to the template
     }
     return render(request, 'menu/menu.html', context)
+
+
+def customer_support_view(request):
+    return render(request, 'customer_support.html')
