@@ -20,10 +20,10 @@
   
   <!-- Custom CSS -->
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-  
+
   <style>
-    /* Offcanvas: 80% width on small screens, up to 350px on large, centered horizontally.
-       Flat left edge, rounded on top/right/bottom. */
+    /* OFFCANVAS: 80% width on small screens, up to 350px on large, centered horizontally.
+       Flat left edge, rounded on the other three sides. */
     .offcanvas-custom {
       width: 80% !important;
       max-width: 350px;
@@ -36,8 +36,7 @@
         width: 320px !important;
       }
     }
-
-    /* Offcanvas header (orange background, no "Good morning") */
+    /* Offcanvas header (orange) */
     .offcanvas-header {
       background-color: #FF6600;
       color: #fff;
@@ -47,7 +46,7 @@
       position: relative;
       text-align: center;
     }
-    /* Close arrow at top-left inside the sidebar */
+    /* Close arrow at top-left */
     .sidebar-close-arrow {
       position: absolute;
       top: 10px;
@@ -56,8 +55,7 @@
       cursor: pointer;
       color: #fff;
     }
-
-    /* White navbar at the top, no extra space above */
+    /* FIXED WHITE NAVBAR AT TOP */
     .navbar {
       background-color: #fff !important;
       border-bottom: 1px solid #eee;
@@ -68,37 +66,53 @@
       width: 100%;
       z-index: 1030;
     }
-    /* Brand name in orange, bigger/bolder font */
+    /* Brand name in orange, bigger/bold font */
     .navbar-brand {
       color: #FF6600 !important;
       font-size: 1.4rem;
       font-weight: 700;
       margin-left: 0.5rem;
     }
-    /* Login link also in orange, with an icon */
+    /* NAVBAR LINKS in orange */
     .navbar .nav-link {
       color: #FF6600 !important;
       font-weight: 600;
+      display: flex;
+      align-items: center;
     }
+    /* If using an icon or image, space it slightly */
     .navbar .nav-link i {
-      margin-right: 4px;
+      margin-right: 6px;
     }
-
-    /* Body offset for the fixed navbar (so content isn't hidden behind it) */
+    .navbar .nav-link img {
+      margin-right: 6px;
+    }
+    /* Body offset for the fixed navbar so content isn't hidden */
     body {
       margin: 0;
-      padding-top: 60px; /* Adjust if you want more/less space under the navbar */
+      padding-top: 60px; /* Adjust as needed */
+      background-color: #f9f9f9; /* example BG color */
+    }
+    /* BANNER: moved up, no big margins */
+    .banner-container {
+      margin: 0 auto;
+      max-width: 600px; /* or any width you prefer */
+      padding: 0 1rem;
+    }
+    .banner-container img {
+      width: 100%;
+      border-radius: 8px;
     }
   </style>
 </head>
-<body class="bg-light">
+<body>
 
   <!-- TOP NAVBAR -->
   <nav class="navbar navbar-expand d-flex align-items-center">
     <div class="container-fluid d-flex align-items-center justify-content-between">
       <!-- Hamburger + Brand on left -->
       <div class="d-flex align-items-center">
-        <button class="btn btn-link text-orange p-0 me-2" 
+        <button class="btn btn-link p-0 me-2" 
                 type="button" 
                 data-bs-toggle="offcanvas" 
                 data-bs-target="#sidebarMenu" 
@@ -109,14 +123,25 @@
         <a class="navbar-brand" href="{% url 'menu' %}">Quickdrop</a>
       </div>
 
-      <!-- Right side: Login or user info -->
+      <!-- Right side: user profile image OR icon -->
       <ul class="navbar-nav ms-auto">
         {% if user.is_authenticated %}
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'profile' %}">
-              <i class="fa fa-user-circle"></i> {{ user.username }}
-            </a>
-          </li>
+          {% if user.profile.profile_picture %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'profile' %}">
+                <img src="{{ user.profile.profile_picture.url }}" 
+                     alt="Profile"
+                     style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
+                {{ user.username }}
+              </a>
+            </li>
+          {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'profile' %}">
+                <i class="fa fa-user-circle"></i>{{ user.username }}
+              </a>
+            </li>
+          {% endif %}
         {% else %}
           <li class="nav-item">
             <a class="nav-link" href="{% url 'login' %}">
@@ -130,14 +155,23 @@
   
   <!-- OFFCANVAS SIDEBAR -->
   <div class="offcanvas offcanvas-start offcanvas-custom" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
-    <!-- SIDEBAR HEADER (no "Good morning") -->
+    <!-- SIDEBAR HEADER (No "Good morning") -->
     <div class="offcanvas-header">
       <i class="fa fa-arrow-left sidebar-close-arrow" data-bs-dismiss="offcanvas"></i>
       <h4 class="mb-2 fw-bold" style="font-size: 1.3rem;">Quickdrop</h4>
       {% if user.is_authenticated %}
-        <div class="text-white">
-          <i class="fa fa-user-circle me-1"></i> {{ user.username }}
-        </div>
+        {% if user.profile.profile_picture %}
+          <div class="text-white">
+            <img src="{{ user.profile.profile_picture.url }}" 
+                 alt="Profile"
+                 style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-right: 5px;">
+            {{ user.username }}
+          </div>
+        {% else %}
+          <div class="text-white">
+            <i class="fa fa-user-circle me-1"></i> {{ user.username }}
+          </div>
+        {% endif %}
       {% else %}
         <a href="{% url 'login' %}" class="btn btn-outline-light" style="font-weight: 600; border-radius: 30px; padding: 0.4rem 1rem;">
           <i class="fa fa-user-circle me-1"></i> Login
@@ -211,13 +245,19 @@
     </div>
   </div>
   
+  <!-- BANNER (Move it up, no large margins) -->
+  <div class="banner-container">
+    <!-- Example banner image; replace with your actual image or remove if not needed -->
+    <img src="{% static 'images/your_banner_image.jpg' %}" alt="Banner" />
+  </div>
+
   <!-- MAIN CONTENT -->
-  <div class="container my-5 pt-3">
+  <div class="container mt-4">
     {% block content %}{% endblock content %}
   </div>
   
   <!-- FOOTER -->
-  <footer class="text-white text-center py-3" style="background-color: #FF6600;">
+  <footer class="text-white text-center py-3" style="background-color: #FF6600; margin-top: 2rem;">
     <div class="container">
       <p class="mb-0">&copy; 2025 Quickdrop | <a href="#" class="text-white">Privacy Policy</a></p>
     </div>
