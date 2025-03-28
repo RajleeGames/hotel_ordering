@@ -1,16 +1,15 @@
 # orders/views.py
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from datetime import date, timedelta
-from .models import Order
-import stripe
-from menu.models import FoodItem
-from .models import Order, OrderItem, Coupon
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+import stripe
+
+from .models import Order, OrderItem, Coupon, Driver
+from menu.models import FoodItem
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -105,7 +104,6 @@ def remove_from_cart(request, item_id):
     
     request.session['cart'] = cart
     return redirect('view_cart')
-
 
 
 def view_cart(request):
@@ -208,7 +206,6 @@ def manage_orders(request):
     return render(request, 'orders/manage_orders.html', context)
 
 
-
 @staff_member_required
 def update_order_status(request, order_id, new_status):
     """
@@ -218,8 +215,6 @@ def update_order_status(request, order_id, new_status):
     order.status = new_status
     order.save()
     return redirect('manage_orders')
-
-
 
 
 @login_required
@@ -243,12 +238,22 @@ def order_status_api(request, order_id):
     return JsonResponse(data)
 
 
-
+@login_required
 def track_order(request, order_id):
+    """
+    Track a specific order. Also fetch all drivers to display as default deliverers.
+    """
     # Restrict to user’s own order or staff
     if request.user.is_staff:
         order = get_object_or_404(Order, pk=order_id)
     else:
         order = get_object_or_404(Order, pk=order_id, user=request.user)
 
-    return render(request, 'orders/track_order.html', {'order': order})
+    # Get all default drivers
+    driver = Driver.objects.first()  # Get the first available driver
+
+
+    return render(request, 'orders/track_order.html', {
+        'order': order,
+        'driver': driver,
+    })

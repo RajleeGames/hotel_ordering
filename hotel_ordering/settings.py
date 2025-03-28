@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure-$dlyy%#*q-76h=)3qntztl3et2!&7$mx_3e1zm+-=(6ieuo7#=
 DEBUG = True 
 
 # Updated ALLOWED_HOSTS to support ngrok
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '2446-41-78-170-132.ngrok-free.app']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'pearl-customized-affairs-astrology.trycloudflare.com']
 
 # Application definition
 INSTALLED_APPS = [
@@ -34,17 +34,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'accounts.apps.AccountsConfig',
-  # For user management
+    'accounts.apps.AccountsConfig', # For user management
     'menu',      # For the food menu
     'orders',    # For order processing and tracking
     'mathfilters',
     'rest_framework',
+    'reviews',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -138,6 +139,26 @@ REST_FRAMEWORK = {
     ],
 }
 
-CSRF_TRUSTED_ORIGINS = [
-     "https://2446-41-78-170-132.ngrok-free.app",
+# settings.py
+
+USE_I18N = True
+USE_L10N = True
+USE_TZ = True
+
+LANGUAGE_CODE = 'en'
+
+LANGUAGES = [
+    ('en', 'English'),
+    ('sw', 'Swahili'),
+    # add other languages if needed
 ]
+
+LOCALE_PATHS = [
+    BASE_DIR / 'locale',  # or your locale folder path
+]
+
+
+CSRF_TRUSTED_ORIGINS = [
+     "https://pearl-customized-affairs-astrology.trycloudflare.com",
+]
+

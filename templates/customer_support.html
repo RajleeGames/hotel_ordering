@@ -1,37 +1,38 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load i18n static %}
 
-{% block title %}Customer Support{% endblock title %}
+{% block title %}{% trans "Customer Support" %}{% endblock title %}
 
 {% block content %}
 <div class="container my-5">
-  <h4 class="mb-4">Customer Support</h4>
-  <p>Need Help? Contact us now.</p>
+  <h4 class="mb-4">{% trans "Customer Support" %}</h4>
+  <p>{% trans "Need Help? Contact us now." %}</p>
 
   <p>
-    <strong>Call us at:</strong> 
+    <strong>{% trans "Call us at:" %}</strong>
     <a href="tel:+255683602474" class="text-decoration-none text-dark">
-      +255 683 602 474
+      +255 718115401
     </a>
   </p>
-  
+
   <p>
-    <strong>Email us at:</strong> 
-    <a href="mailto:quickdropa@gmail.com" class="text-decoration-none text-dark">
-      quickdropa@gmail.com
+    <strong>{% trans "Email us at:" %}</strong>
+    <a href="mailto:mirajially999@gmail.com" class="text-decoration-none text-dark">
+      mirajially999@gmail.com
     </a>
   </p>
-  
-  <p>
-    <a href="#" class="text-decoration-none">
-      Visit our website
-    </a>
-  </p>
-  
+
   <p>
     <a href="#" class="text-decoration-none">
-      Read our privacy policy
+      {% trans "Visit our website" %}
     </a>
   </p>
+
+  <p>
+    <a href="#" class="text-decoration-none">
+      {% trans "Read our privacy policy" %}
+    </a>
+  </p>
+  </form>
 </div>
 {% endblock content %}

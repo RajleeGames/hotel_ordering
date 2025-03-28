@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Add Review{% endblock %}
+
+{% block content %}
+<section class="customer-reviews my-5">
+  <h2 class="text-center mb-4">Leave a Review</h2>
+
+  <!-- Add a Review Form Only -->
+  <div class="review-form card p-4">
+    <form method="POST" action="{% url 'customer_reviews' %}">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label">Rating:</label>
+        <div class="star-rating">
+          <input type="radio" id="star5" name="rating" value="5" required>
+          <label for="star5" title="Excellent"><i class="fas fa-star"></i></label>
+          <input type="radio" id="star4" name="rating" value="4">
+          <label for="star4" title="Very Good"><i class="fas fa-star"></i></label>
+          <input type="radio" id="star3" name="rating" value="3">
+          <label for="star3" title="Good"><i class="fas fa-star"></i></label>
+          <input type="radio" id="star2" name="rating" value="2">
+          <label for="star2" title="Fair"><i class="fas fa-star"></i></label>
+          <input type="radio" id="star1" name="rating" value="1">
+          <label for="star1" title="Poor"><i class="fas fa-star"></i></label>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="comment" class="form-label">Comment:</label>
+        <textarea name="comment" id="comment" rows="4" class="form-control" placeholder="Share your experience..." required></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary glow-button">Submit Review</button>
+    </form>
+    {% if review_submitted %}
+    <div class="alert alert-success mt-4 text-center" style="font-size: 1.2rem;">
+      <strong>Review Submitted Successfully!</strong> Thank you for sharing your experience. We appreciate your feedback!
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Custom Styles for the Review Page -->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+  .customer-reviews {
+    background-color: #fdfdfd;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    font-family: 'Poppins', sans-serif;
+  }
+  .review-form {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  /* Star Rating Styles */
+  .star-rating {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+    padding: 0.5rem 0;
+  }
+  .star-rating input {
+    display: none;
+  }
+  .star-rating label {
+    font-size: 2rem;
+    color: #ccc;
+    cursor: pointer;
+    transition: color 0.2s;
+    margin: 0 0.1rem;
+  }
+  .star-rating input:checked ~ label,
+  .star-rating label:hover,
+  .star-rating label:hover ~ label {
+    color: #FFCC00;
+  }
+  .glow-button {
+    position: relative;
+    overflow: hidden;
+    border-radius: 30px;
+    background: linear-gradient(45deg, #ff6600, #ff3300);
+    color: #fff;
+    border: none;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .glow-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(255,105,0,0.7);
+  }
+</style>
+{% endblock %}

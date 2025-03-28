@@ -5,6 +5,19 @@ from menu.models import FoodItem
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
+class Driver(models.Model):
+    """
+    A separate model for default deliverers (drivers).
+    You can manage these in the admin once, and display them for all orders.
+    """
+    name = models.CharField(max_length=100)
+    phone = models.CharField(max_length=20)
+    image = models.ImageField(upload_to='drivers/', blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Order(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -20,7 +33,7 @@ class Order(models.Model):
     total_price = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
     delivery_address = models.TextField(blank=True, null=True)
 
-    # Fields for real-time tracking
+    # For real-time tracking (optional)
     driver_lat = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     driver_lng = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
 

@@ -23,11 +23,17 @@
     {% endfor %}
   </tbody>
 </table>
-<h4>Total: Tsh{{ total }}</h4>
 
-<!-- Checkout Form (including Coupon Code) -->
+<!-- Pricing Details -->
+<h4>Subtotal: Tsh{{ total }}</h4>
+<h4>Delivery Fee: Tsh1000</h4>
+<h4>Grand Total: Tsh{{ total|add:1000 }}</h4>
+
+<!-- Checkout Form (including Coupon Code and Payment Options) -->
 <form method="POST">
   {% csrf_token %}
+  
+  <!-- Coupon Code Section -->
   <div class="mb-3">
     <label for="coupon_code" class="form-label">Have a coupon?</label>
     <input 
@@ -38,6 +44,55 @@
       placeholder="Enter code"
     >
   </div>
+  
+  <!-- Payment Method Selection -->
+  <div class="mb-3">
+    <label class="form-label">Payment Method:</label>
+    <div>
+      <input 
+        type="radio" 
+        name="payment_method" 
+        value="cash" 
+        id="cash" 
+        checked 
+        onclick="toggleMobileMoneyOptions()"
+      >
+      <label for="cash">Cash</label>
+    </div>
+    <div>
+      <input 
+        type="radio" 
+        name="payment_method" 
+        value="mobile_money" 
+        id="mobile_money" 
+        onclick="toggleMobileMoneyOptions()"
+      >
+      <label for="mobile_money">Mobile Money</label>
+    </div>
+  </div>
+
+  <!-- Mobile Money Options (only visible when mobile money is selected) -->
+  <div class="mb-3" id="mobileMoneyOptions" style="display:none;">
+    <label for="mobile_operator" class="form-label">Select Mobile Money Operator:</label>
+    <select name="mobile_operator" id="mobile_operator" class="form-control">
+      <option value="mpesa">Mpesa</option>
+      <option value="tigo_pesa">Tigo Pesa</option>
+      <option value="airtel_money">Airtel Money</option>
+    </select>
+  </div>
+
   <button type="submit" class="btn btn-primary">Place Order</button>
 </form>
+
+<!-- JavaScript to toggle Mobile Money Options -->
+<script>
+  function toggleMobileMoneyOptions() {
+    var mobileMoneyOptions = document.getElementById("mobileMoneyOptions");
+    if (document.getElementById("mobile_money").checked) {
+      mobileMoneyOptions.style.display = "block";
+    } else {
+      mobileMoneyOptions.style.display = "none";
+    }
+  }
+</script>
 {% endblock %}

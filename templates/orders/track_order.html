@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
 Track Your Order
@@ -6,29 +7,62 @@ Track Your Order
 
 {% block content %}
 <style>
+  /* Make the map smaller on very small screens */
   @media (max-width: 576px) {
     #map {
       height: 300px;
     }
+  }
+  /* Optional: styling for the driver image to be circular */
+  .driver-img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
   }
 </style>
 
 <div class="container my-5">
   <div class="row justify-content-center">
     <div class="col-12 col-md-8">
-      <div class="card shadow-sm">
+      <div class="card shadow-sm mb-4">
         <div class="card-body text-center">
           <h1 class="card-title mb-4">Order #{{ order.id }} Tracking</h1>
-          
+
           <p class="card-text mb-1">
-            <strong>Status:</strong> 
+            <strong>Status:</strong>
             <span id="order-status">{{ order.status }}</span>
           </p>
-          
+
           <p class="card-text mb-3">
             <strong>Total Price:</strong> 
-            $<span id="order-price">{{ order.total_price }}</span>
+            Tsh<span id="order-price">{{ order.total_price }}</span>
           </p>
+
+          <!-- Single Default Driver Card -->
+          <div class="card shadow-sm mb-3">
+            <div class="card-body text-center">
+              <h5 class="mb-3">Delivery Person</h5>
+              
+              {% if driver %}
+                {% if driver.image %}
+                  <img src="{{ driver.image.url }}" alt="Driver" class="driver-img mb-2">
+                {% else %}
+                  <img src="{% static 'images/default_driver.png' %}" alt="Driver" class="driver-img mb-2">
+                {% endif %}
+
+                <p class="mb-1"><strong>Name:</strong> {{ driver.name }}</p>
+                <p class="mb-1"><strong>Phone:</strong> {{ driver.phone }}</p>
+                
+                <!-- Call Button (tel: link) -->
+                <a href="tel:{{ driver.phone }}" class="btn btn-success mt-2">
+                  <i class="fa fa-phone"></i> Call Driver
+                </a>
+              {% else %}
+                <p>No default driver is set.</p>
+              {% endif %}
+            </div>
+          </div>
 
           <!-- Responsive Map Container -->
           <div id="map" class="rounded border" style="width: 100%; height: 400px;"></div>
@@ -40,8 +74,8 @@ Track Your Order
 {% endblock content %}
 
 {% block extra_scripts %}
-<!-- Replace with your actual API key -->
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD2DjhC1TK5fP73C-Nv8OTtwJWubK3dH9I"></script>
+<!-- Replace with your actual Google Maps API key -->
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY"></script>
 
 <script>
   let map;
@@ -52,12 +86,13 @@ Track Your Order
   if ("Notification" in window) {
     Notification.requestPermission().then(permission => {
       console.log("Notification permission:", permission);
-      // Uncomment below to force test notification after permission is granted
+      // If needed, test notifications here:
       // if (permission === "granted") showOrderNotification("Test Status");
     });
   }
 
-  // Initialize the map with a default location (default: 0,0)
+  // Initialize the map with a default location (0,0)
+  // or real coords if you store them in the order
   function initMap(lat = 0, lng = 0) {
     const center = { lat: lat, lng: lng };
     map = new google.maps.Map(document.getElementById("map"), {
@@ -79,18 +114,16 @@ Track Your Order
 
   // Show a notification with an icon and an in-page alert
   function showOrderNotification(newStatus) {
-    console.log("Attempting to show notification for status:", newStatus);
-    // Basic in-page alert for demonstration
+    console.log("Showing notification for status:", newStatus);
+    // Basic in-page alert
     alert(`Your order status changed to: ${newStatus}`);
 
-    // HTML5 browser notification with a custom icon
+    // Browser notification
     if ("Notification" in window && Notification.permission === "granted") {
       new Notification("Order Update", {
         body: `Your order is now: ${newStatus}`,
-        icon: "/static/images/notification_icon.png" // Ensure this path is correct
+        icon: "{% static 'images/notification_icon.png' %}" // adjust path as needed
       });
-    } else {
-      console.warn("Notification not permitted or unsupported.");
     }
   }
 

@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Reviews{% endblock title %}
+
+{% block content %}
+<div class="container my-5">
+  <h2 class="text-center mb-4">Manage Customer Reviews</h2>
+  
+  <!-- Date Filter Form -->
+  <form method="get" class="row g-3 mb-4 justify-content-center">
+    <div class="col-auto">
+      <label for="date_filter" class="form-label fw-bold">Filter By:</label>
+      <select name="date_filter" id="date_filter" class="form-select" onchange="this.form.submit()">
+        <option value="">All</option>
+        <option value="today" {% if date_filter == 'today' %}selected{% endif %}>Today</option>
+        <option value="yesterday" {% if date_filter == 'yesterday' %}selected{% endif %}>Yesterday</option>
+        <option value="last_7_days" {% if date_filter == 'last_7_days' %}selected{% endif %}>Last 7 Days</option>
+        <option value="last_month" {% if date_filter == 'last_month' %}selected{% endif %}>Last Month</option>
+        <option value="last_6_months" {% if date_filter == 'last_6_months' %}selected{% endif %}>Last 6 Months</option>
+      </select>
+    </div>
+  </form>
+
+  <!-- Reviews List -->
+  {% for review in reviews %}
+    <div class="card mb-3 shadow-sm animate__animated animate__fadeInUp">
+      <div class="card-body">
+        <h5 class="card-title">
+          {{ review.user.username }}
+          <!-- Display exactly 5 stars based on review.rating -->
+          {% for i in "12345"|make_list %}
+            {% if forloop.counter <= review.rating %}
+              <i class="fas fa-star text-warning"></i>
+            {% else %}
+              <i class="far fa-star text-warning"></i>
+            {% endif %}
+          {% endfor %}
+        </h5>
+        <p class="card-text">{{ review.comment }}</p>
+        <p class="card-text text-muted"><small>{{ review.created_at|date:"M d, Y" }}</small></p>
+      </div>
+    </div>
+  {% empty %}
+    <p class="text-center mt-4">No reviews found for this period.</p>
+  {% endfor %}
+</div>
+
+<style>
+  /* Optional styling for a fancy look */
+  .card {
+    border-left: 5px solid #FF6600;
+  }
+</style>
+{% endblock content %}
