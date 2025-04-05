@@ -1,25 +1,27 @@
-# hotel_ordering/urls.py
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static 
-from django.conf.urls.i18n import i18n_patterns
 
- 
+from .views import intro_view  # Import the intro view
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('menu.urls')),        # Existing web routes
-    path('orders/', include('orders.urls')),  # Existing order pages (cart, checkout, manage_orders)
+    
+    # Set intro page as the homepage
+    path('', intro_view, name='intro'),
+
+    # Keep all other app routes
+    path('menu/', include('menu.urls')),        
+    path('orders/', include('orders.urls')),  
     path('accounts/', include('accounts.urls')),
-     path("", include("reviews.urls")),
-    
-    
-    
+    path('reviews/', include('reviews.urls')),
+    path('notifications/', include('notifications.urls')),
+
+
     # NEW: DRF API
     path('api/', include('orders.api_urls')), 
-    
 ]
-
 
 
 

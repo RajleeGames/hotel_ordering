@@ -1,0 +1,283 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="profile-container mx-auto">
+  <!-- Title -->
+  <h2 class="profile-title">My Profile</h2>
+  
+  <!-- Top User Info -->
+  <div class="profile-card">
+    <div class="d-flex align-items-center">
+      {% if user.profile.profile_picture %}
+        <img src="{{ user.profile.profile_picture.url }}" alt="Profile" class="profile-img">
+      {% else %}
+        <img src="https://via.placeholder.com/60x60?text=No+Img" alt="Profile" class="profile-img">
+      {% endif %}
+      <div class="profile-info">
+        <h5 class="profile-username">{{ user.username }}</h5>
+        <a href="{% url 'profiles' %}" class="view-account">View Account</a>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Profile Options -->
+  <ul class="profile-list list-group">
+    <li class="list-group-item profile-item">
+      <i class="bi bi-geo-alt-fill icon"></i>
+      <span>My Saved Places</span>
+    </li>
+    <li class="list-group-item profile-item d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center">
+        <i class="bi bi-bell-fill icon"></i>
+        <span>Marketing Notifications</span>
+      </div>
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="marketingSwitch" checked>
+      </div>
+    </li>
+    <li class="list-group-item profile-item">
+      <i class="bi bi-star-fill icon"></i>
+      <a href="{% url 'customer_reviews' %}" class="profile-link"> Review</a>
+    </li>    
+    <li class="list-group-item profile-item">
+      <i class="bi bi-question-circle-fill icon"></i>
+      <a href="{% url 'customer_support' %}" class="profile-link">Help</a>
+    </li>
+    <li class="list-group-item profile-item d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center">
+        <i class="bi bi-globe2 icon"></i>
+        <span>Language</span>
+      </div>
+      <select class="form-select form-select-sm language-select">
+        <option>English</option>
+        <option>Swahili</option>
+      </select>
+    </li>
+    {% if user.is_staff %}
+      <li class="list-group-item profile-item">
+        <i class="fa fa-tasks icon"></i>
+        <a href="{% url 'manage_orders' %}" class="profile-link">Manage Orders</a>
+      </li>
+      <li class="list-group-item profile-item">
+        <i class="fa fa-star icon"></i>
+        <a href="{% url 'manage_reviews' %}" class="profile-link">Manage Reviews</a>
+      </li>
+    {% endif %}
+    <!-- Logout is now last -->
+    <li class="list-group-item profile-item">
+      <i class="fa fa-sign-out-alt icon"></i>
+      <a href="{% url 'logout' %}?next=/" class="profile-link">Logout</a>
+    </li>
+  </ul>
+  
+  <!-- Connection Status & Version -->
+  <!-- Clicking this card triggers the modal -->
+  <div 
+    class="status-card" 
+    style="cursor: pointer;" 
+    data-bs-toggle="modal" 
+    data-bs-target="#connectionStatusModal"
+  >
+    <p class="mb-1">Connection Status <span class="status-indicator">●</span></p>
+    <small class="version">v0.0.1</small>
+  </div>
+</div>
+
+<!-- MODAL for Connection Status -->
+<div class="modal fade" id="connectionStatusModal" tabindex="-1" aria-labelledby="connectionStatusModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="background-color: #1e1e1e; border-radius: 12px;">
+      <div class="modal-body p-4 text-white" style="font-size: 0.9rem;">
+        <!-- Title -->
+        <h5 id="connectionStatusModalLabel" class="mb-2" style="font-weight: 600;">Connection Status</h5>
+        <!-- Last Update -->
+        <p id="lastUpdate" style="font-size: 0.75rem; color: #ccc;">
+          Last Update: 2025-04-02 14:24
+        </p>
+        
+        <!-- Status List -->
+        <div class="mb-3">
+          <div class="d-flex align-items-center mb-2">
+            <div>
+              <strong class="status-text ok" style="font-size: 0.85rem;">Ok</strong><br>
+              <small style="color: #999;">The Websocket Works Normally</small>
+            </div>
+          </div>
+          <div class="d-flex align-items-center mb-2">
+            <div>
+              <strong class="status-text connecting" style="font-size: 0.85rem;">Connecting</strong><br>
+              <small style="color: #999;">The Websocket is Connecting</small>
+            </div>
+          </div>
+          <div class="d-flex align-items-center">
+            <div>
+              <strong class="status-text disconnected" style="font-size: 0.85rem;">Disconnected</strong><br>
+              <small style="color: #999;">The Server is Slow, Please Reload</small>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Buttons -->
+        <div class="d-flex justify-content-end">
+          <button 
+            type="button" 
+            class="btn btn-outline-light me-2" 
+            data-bs-dismiss="modal"
+            style="border-radius: 8px; font-size: 0.8rem;"
+          >
+            Close
+          </button>
+          <button 
+            type="button" 
+            class="btn" 
+            onclick="updateConnectionStatus()" 
+            style="background-color: #FF6600; color: #fff; border-radius: 8px; font-size: 0.8rem;"
+          >
+            Update
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Container */
+.profile-container {
+  max-width: 600px;
+  font-size: 0.85rem;
+  padding: 1rem;
+}
+
+/* Title */
+.profile-title {
+  color: #333;
+  background-color: #f8f9fa;
+  padding: 0.75rem;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+/* Profile Card */
+.profile-card {
+  background-color: #fff;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+.profile-img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 10px;
+}
+.profile-info {
+  font-size: 0.8rem;
+  line-height: 1.2;
+}
+.profile-username {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.view-account {
+  font-size: 0.7rem;
+  color: #007bff;
+  text-decoration: none;
+}
+.view-account:hover {
+  text-decoration: underline;
+}
+
+/* Profile List Items */
+.profile-list .profile-item {
+  background-color: #fff;
+  color: #333;
+  border: 1px solid #ddd;
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+}
+.profile-list .profile-item .icon {
+  font-size: 1rem;
+  color: #FF6600;
+  margin-right: 10px;
+}
+
+/* Links */
+.profile-link {
+  color: #333;
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+.profile-link:hover {
+  text-decoration: underline;
+}
+
+/* Language select */
+.language-select {
+  width: 100px;
+  font-size: 0.75rem;
+  padding: 0.25rem;
+}
+
+/* Status Card */
+.status-card {
+  background-color: #f8f9fa;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 0.75rem;
+  text-align: center;
+  font-size: 0.75rem;
+  margin-top: 1rem;
+}
+.status-indicator {
+  color: #28a745;
+  font-size: 1rem;
+}
+.version {
+  color: #6c757d;
+}
+
+/* Status Text Dots using pseudo-elements */
+.status-text.ok::before {
+  content: "●";
+  color: #28a745;
+  margin-right: 5px;
+}
+.status-text.connecting::before {
+  content: "●";
+  color: #ffc107;
+  margin-right: 5px;
+}
+.status-text.disconnected::before {
+  content: "●";
+  color: #dc3545;
+  margin-right: 5px;
+}
+</style>
+
+<script>
+  // Simple function to update the "Last Update" timestamp in the modal
+  function updateConnectionStatus() {
+    const lastUpdateElem = document.getElementById('lastUpdate');
+    const now = new Date();
+    const formatted = now.getFullYear() + '-' 
+                    + String(now.getMonth() + 1).padStart(2, '0') + '-' 
+                    + String(now.getDate()).padStart(2, '0') + ' '
+                    + String(now.getHours()).padStart(2, '0') + ':'
+                    + String(now.getMinutes()).padStart(2, '0') + ':'
+                    + String(now.getSeconds()).padStart(2, '0');
+    lastUpdateElem.textContent = 'Last Update: ' + formatted;
+  }
+</script>
+{% endblock %}

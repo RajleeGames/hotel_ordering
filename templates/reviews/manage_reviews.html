@@ -4,14 +4,14 @@
 {% block title %}Manage Reviews{% endblock title %}
 
 {% block content %}
-<div class="container my-5">
-  <h2 class="text-center mb-4">Manage Customer Reviews</h2>
+<div class="container my-5 manage-reviews-container">
+  <h2 class="text-center mb-4 manage-reviews-title">Manage Customer Reviews</h2>
   
   <!-- Date Filter Form -->
-  <form method="get" class="row g-3 mb-4 justify-content-center">
+  <form method="get" class="row g-3 mb-4 justify-content-center filter-form">
     <div class="col-auto">
-      <label for="date_filter" class="form-label fw-bold">Filter By:</label>
-      <select name="date_filter" id="date_filter" class="form-select" onchange="this.form.submit()">
+      <label for="date_filter" class="form-label filter-label">Filter By:</label>
+      <select name="date_filter" id="date_filter" class="form-select filter-select" onchange="this.form.submit()">
         <option value="">All</option>
         <option value="today" {% if date_filter == 'today' %}selected{% endif %}>Today</option>
         <option value="yesterday" {% if date_filter == 'yesterday' %}selected{% endif %}>Yesterday</option>
@@ -24,32 +24,116 @@
 
   <!-- Reviews List -->
   {% for review in reviews %}
-    <div class="card mb-3 shadow-sm animate__animated animate__fadeInUp">
+    <div class="card review-card mb-3 shadow-sm animate__animated animate__fadeInUp">
       <div class="card-body">
-        <h5 class="card-title">
+        <h5 class="card-title review-title">
           {{ review.user.username }}
           <!-- Display exactly 5 stars based on review.rating -->
           {% for i in "12345"|make_list %}
             {% if forloop.counter <= review.rating %}
-              <i class="fas fa-star text-warning"></i>
+              <i class="fas fa-star star-filled"></i>
             {% else %}
-              <i class="far fa-star text-warning"></i>
+              <i class="far fa-star star-empty"></i>
             {% endif %}
           {% endfor %}
         </h5>
-        <p class="card-text">{{ review.comment }}</p>
-        <p class="card-text text-muted"><small>{{ review.created_at|date:"M d, Y" }}</small></p>
+        <p class="card-text review-comment">{{ review.comment }}</p>
+        <p class="card-text text-muted review-date"><small>{{ review.created_at|date:"M d, Y" }}</small></p>
       </div>
     </div>
   {% empty %}
-    <p class="text-center mt-4">No reviews found for this period.</p>
+    <p class="text-center mt-4 no-reviews-text">No reviews found for this period.</p>
   {% endfor %}
 </div>
 
 <style>
-  /* Optional styling for a fancy look */
-  .card {
+  /* Container & Title */
+  .manage-reviews-container {
+    max-width: 700px;
+    font-size: 0.85rem;
+  }
+  .manage-reviews-title {
+    font-weight: 600;
+    font-size: 1.5rem;
+    color: #333;
+  }
+
+  /* Filter Form */
+  .filter-form {
+    font-size: 0.8rem;
+  }
+  .filter-label {
+    font-weight: 500;
+    margin-right: 0.5rem;
+    color: #555;
+  }
+  .filter-select {
+    min-width: 150px;
+    font-size: 0.8rem;
+    padding: 0.35rem;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+  }
+
+  /* Review Cards */
+  .review-card {
+    border: none;
     border-left: 5px solid #FF6600;
+    border-radius: 8px;
+    background: #fff;
+    padding: 1rem;
+  }
+  .review-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+  .review-comment {
+    font-size: 0.85rem;
+    color: #555;
+    margin-bottom: 0.5rem;
+  }
+  .review-date small {
+    font-size: 0.75rem;
+    color: #999;
+  }
+
+  /* Stars */
+  .star-filled {
+    color: #FFC107;
+    font-size: 0.9rem;
+    margin-left: 2px;
+  }
+  .star-empty {
+    color: #FFC107;
+    font-size: 0.9rem;
+    margin-left: 2px;
+  }
+
+  /* No Reviews Message */
+  .no-reviews-text {
+    font-size: 0.9rem;
+    color: #777;
+  }
+
+  /* Responsive Adjustments */
+  @media (max-width: 576px) {
+    .manage-reviews-container {
+      font-size: 0.8rem;
+    }
+    .filter-select {
+      min-width: 120px;
+    }
+    .review-card {
+      padding: 0.75rem;
+    }
+    .review-title {
+      font-size: 0.9rem;
+    }
+    .review-comment {
+      font-size: 0.8rem;
+    }
   }
 </style>
 {% endblock content %}

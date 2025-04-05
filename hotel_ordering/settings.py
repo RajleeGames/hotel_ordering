@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure-$dlyy%#*q-76h=)3qntztl3et2!&7$mx_3e1zm+-=(6ieuo7#=
 DEBUG = True 
 
 # Updated ALLOWED_HOSTS to support ngrok
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'pearl-customized-affairs-astrology.trycloudflare.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'ltd-threaded-trusts-ukraine.trycloudflare.com']
 
 # Application definition
 INSTALLED_APPS = [
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'mathfilters',
     'rest_framework',
     'reviews',
+    'notifications',
 ]
 
 MIDDLEWARE = [
@@ -67,6 +68,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'notifications.context_processors.notifications_count',
             ],
         },
     },
@@ -159,6 +161,20 @@ LOCALE_PATHS = [
 
 
 CSRF_TRUSTED_ORIGINS = [
-     "https://pearl-customized-affairs-astrology.trycloudflare.com",
+     "https://ltd-threaded-trusts-ukraine.trycloudflare.com",
 ]
 
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'hajraally499@gmail.com'
+EMAIL_HOST_PASSWORD = 'dcxokvxeoydjknwf'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+
+
+CLICKPESA_API_KEY = os.environ.get("CLICKPESA_API_KEY", "SKB1jnjsVI4EZekMa3zzcdfQp7nGp7ZER9Plbv3Gnd")
+CLICKPESA_CLIENT_ID = os.environ.get("CLICKPESA_CLIENT_ID", "IDCkKJSf613UpykdzCI9iBUHFWA0wzgk")

@@ -1,4 +1,3 @@
-# orders/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.conf import settings
@@ -123,7 +122,7 @@ def checkout(request):
     """
     Checkout view that handles coupon code processing,
     creates an Order and corresponding OrderItems, applies discount,
-    and then clears the cart.
+    adds a fixed delivery fee (TZS 1000), and then clears the cart.
     """
     cart = request.session.get('cart', {})
     if not cart:
@@ -131,6 +130,7 @@ def checkout(request):
         return redirect('menu')
 
     discount_amount = 0
+    delivery_fee = 1000  # Fixed delivery fee
 
     if request.method == 'POST':
         coupon_code = request.POST.get('coupon_code', '').strip()
@@ -159,8 +159,13 @@ def checkout(request):
             )
 
         # Apply discount if any.
-        total = subtotal - float(discount_amount)
-        order.total_price = total if total > 0 else 0
+        net_total = subtotal - float(discount_amount)
+        gross_total = net_total + delivery_fee  # Add fixed delivery fee
+
+        order.total_price = gross_total if gross_total > 0 else 0
+        # Optionally, store subtotal and delivery fee on the order if your model supports these fields.
+        # order.subtotal = subtotal
+        # order.delivery_fee = delivery_fee
         order.save()
 
         # Clear the cart.
@@ -168,10 +173,16 @@ def checkout(request):
         messages.success(request, "Your order has been placed!")
         return redirect('order_confirmation', order_id=order.id)
 
-    total = sum(float(item['price']) * item['quantity'] for item in cart.values())
+    # For GET requests, calculate the subtotal from the cart
+    subtotal = sum(float(item['price']) * item['quantity'] for item in cart.values())
+    net_total = subtotal  # No discount applied for GET
+    gross_total = net_total + delivery_fee
+
     context = {
         'cart': cart,
-        'total': total,
+        'subtotal': subtotal,
+        'delivery_fee': delivery_fee,
+        'gross_total': gross_total,
     }
     return render(request, 'orders/checkout.html', context)
 
@@ -249,11 +260,54 @@ def track_order(request, order_id):
     else:
         order = get_object_or_404(Order, pk=order_id, user=request.user)
 
-    # Get all default drivers
-    driver = Driver.objects.first()  # Get the first available driver
-
+    # Get the first available driver (if any)
+    driver = Driver.objects.first()
 
     return render(request, 'orders/track_order.html', {
         'order': order,
+        'driver': driver,
+    })
+
+
+@login_required
+def my_orders(request):
+    orders = Order.objects.filter(user=request.user).order_by('-created_at')
+
+    # Get filters from GET request
+    order_id_filter = request.GET.get('order_id', '').strip()
+    status_filter = request.GET.get('status', '').strip()
+
+    # Apply filters
+    if order_id_filter:
+        orders = orders.filter(id=order_id_filter)
+
+    if status_filter:
+        orders = orders.filter(status__iexact=status_filter)  # Case-insensitive match
+
+    # Return JSON response if AJAX request
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        orders_data = [
+            {
+                'id': order.id,
+                'date': order.created_at.strftime('%b %d, %Y'),
+                'total_price': str(order.total_price),
+                'status': order.status,
+                'detail_url': f"/orders/order/{order.id}/"
+            }
+            for order in orders
+        ]
+        return JsonResponse({'orders': orders_data})
+
+    return render(request, 'orders/my_orders.html', {'orders': orders})
+
+@login_required
+def order_detail(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    # Use the assigned driver if available, otherwise default to the first available driver.
+    driver = order.driver if hasattr(order, 'driver') and order.driver else Driver.objects.first()
+    items_total = sum(item.quantity * item.price for item in order.items.all())
+    return render(request, 'orders/order_detail.html', {
+        'order': order,
+        'items_total': items_total,
         'driver': driver,
     })

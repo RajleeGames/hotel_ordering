@@ -5,13 +5,11 @@
 
 {% block content %}
 <section class="customer-reviews my-5">
-  <h2 class="text-center mb-4">Leave a Review</h2>
-
-  <!-- Add a Review Form Only -->
+  <h2 class="review-title">Leave a Review</h2>
   <div class="review-form card p-4">
     <form method="POST" action="{% url 'customer_reviews' %}">
       {% csrf_token %}
-      <div class="mb-3">
+      <div class="form-group rating-group">
         <label class="form-label">Rating:</label>
         <div class="star-rating">
           <input type="radio" id="star5" name="rating" value="5" required>
@@ -26,70 +24,122 @@
           <label for="star1" title="Poor"><i class="fas fa-star"></i></label>
         </div>
       </div>
-      <div class="mb-3">
+      <div class="form-group comment-group">
         <label for="comment" class="form-label">Comment:</label>
-        <textarea name="comment" id="comment" rows="4" class="form-control" placeholder="Share your experience..." required></textarea>
+        <textarea name="comment" id="comment" rows="3" class="form-control" placeholder="Share your experience..." required></textarea>
       </div>
-      <button type="submit" class="btn btn-primary glow-button">Submit Review</button>
+      <button type="submit" class="btn glow-button submit-btn">Submit Review</button>
     </form>
     {% if review_submitted %}
-    <div class="alert alert-success mt-4 text-center" style="font-size: 1.2rem;">
-      <strong>Review Submitted Successfully!</strong> Thank you for sharing your experience. We appreciate your feedback!
+    <div class="alert alert-success mt-4 text-center review-alert">
+      <strong>Review Submitted Successfully!</strong> Thank you for your feedback.
     </div>
     {% endif %}
   </div>
 </section>
 
-<!-- Custom Styles for the Review Page -->
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 
+  /* Overall Section */
   .customer-reviews {
-    background-color: #fdfdfd;
-    padding: 2rem;
+    background: #f9f9f9;
+    padding: 1.5rem;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    box-shadow: 0 0 15px rgba(0,0,0,0.05);
     font-family: 'Poppins', sans-serif;
+    max-width: 600px;
+    margin: 0 auto;
+    animation: fadeIn 0.8s ease-out;
   }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .review-title {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: #333;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+  
+  /* Review Form Card */
   .review-form {
-    background-color: #fff;
+    background: linear-gradient(135deg, #ffffff, #f2f2f2);
+    border: none;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    font-size: 0.85rem;
   }
-  /* Star Rating Styles */
+  
+  /* Form Groups */
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  .form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #555;
+  }
+  .form-control {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    transition: border 0.3s, box-shadow 0.3s;
+    font-size: 0.85rem;
+  }
+  .form-control:focus {
+    outline: none;
+    border-color: #C3563F;
+    box-shadow: 0 0 8px rgba(195,86,63,0.3);
+  }
+  
+  /* Star Rating */
   .star-rating {
     display: flex;
     flex-direction: row-reverse;
     justify-content: center;
-    padding: 0.5rem 0;
+    gap: 0.2rem;
+    padding: 0.3rem 0;
   }
-  .star-rating input {
-    display: none;
-  }
+  .star-rating input { display: none; }
   .star-rating label {
-    font-size: 2rem;
+    font-size: 1.8rem;
     color: #ccc;
     cursor: pointer;
     transition: color 0.2s;
-    margin: 0 0.1rem;
   }
   .star-rating input:checked ~ label,
   .star-rating label:hover,
   .star-rating label:hover ~ label {
     color: #FFCC00;
   }
-  .glow-button {
-    position: relative;
-    overflow: hidden;
-    border-radius: 30px;
+  
+  /* Submit Button */
+  .submit-btn {
+    width: 100%;
+    padding: 0.75rem;
     background: linear-gradient(45deg, #ff6600, #ff3300);
     color: #fff;
     border: none;
+    border-radius: 30px;
+    font-weight: 600;
     transition: transform 0.3s, box-shadow 0.3s;
+    font-size: 0.9rem;
   }
-  .glow-button:hover {
+  .submit-btn:hover {
     transform: scale(1.05);
     box-shadow: 0 0 15px rgba(255,105,0,0.7);
+  }
+  
+  /* Alert Message */
+  .review-alert {
+    font-size: 0.9rem;
+    padding: 0.75rem;
   }
 </style>
 {% endblock %}

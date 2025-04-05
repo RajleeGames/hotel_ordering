@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Messages" %}{% endblock %}
+
+{% block content %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap');
+
+  .container {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.85rem;
+  }
+
+  .header-section {
+    display: flex;
+    flex-direction: column;
+    flex-sm-row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .header-section h2 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+    color: #333;
+  }
+
+  .notification-badge {
+    background-color: red;
+    color: white;
+    font-size: 0.75rem;
+    padding: 3px 8px;
+    border-radius: 12px;
+    margin-left: 8px;
+    display: inline-block;
+  }
+
+  .filter-form select {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    width: auto;
+    display: inline-block;
+  }
+  .filter-form button {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    margin-left: 0.5rem;
+  }
+
+  .card {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  /* Unread messages: light yellow background with gold left border */
+  .unread {
+    background-color: #fff3cd !important;
+    border-left: 5px solid #ffc107;
+  }
+  /* Read messages: plain white background */
+  .read {
+    background-color: #fff;
+  }
+
+  .card h5 {
+    margin-bottom: 0.25rem;
+    font-size: 0.95rem;
+    color: #444;
+  }
+  .card p {
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    color: #555;
+  }
+  .card small {
+    font-size: 0.7rem;
+    color: #888;
+  }
+
+  @media (max-width: 576px) {
+    .container {
+      padding: 10px;
+    }
+    .header-section h2 {
+      font-size: 1.1rem;
+    }
+    .filter-form select, .filter-form button {
+      font-size: 0.7rem;
+    }
+  }
+</style>
+
+<div class="container my-4">
+  <div class="header-section d-flex flex-column flex-sm-row justify-content-between align-items-center">
+    <h2 class="mb-2">
+      {% trans "Messages from Staff" %}
+      {% if unread_count > 0 %}
+        <span class="notification-badge">{{ unread_count }}</span>
+      {% endif %}
+    </h2>
+    <div class="d-flex align-items-center filter-form">
+      <!-- Filter Form (auto-submit on change) -->
+      <form method="get" action="" class="me-2">
+        <select name="filter" class="form-control form-control-sm" onchange="this.form.submit()">
+          <option value="all" {% if filter == 'all' %}selected{% endif %}>{% trans "All" %}</option>
+          <option value="read" {% if filter == 'read' %}selected{% endif %}>{% trans "Read" %}</option>
+          <option value="unread" {% if filter == 'unread' %}selected{% endif %}>{% trans "Unread" %}</option>
+        </select>
+      </form>
+      <!-- Mark as Read Form -->
+      <form method="post" action="{% url 'clear_notifications' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger btn-sm">
+          {% trans "Mark as Read" %}
+        </button>
+      </form>
+    </div>
+  </div>
+
+  {% if notifications %}
+    {% for note in notifications %}
+      <div class="card my-2 p-3 shadow-sm {% if user not in note.read_by.all %}unread{% else %}read{% endif %}"
+           data-id="{{ note.id }}"
+           data-title="{{ note.title }}"
+           data-message="{{ note.message }}"
+           data-date="{{ note.created_at|date:'M d, Y h:i A' }}">
+        <h5>{{ note.title }}</h5>
+        <p>{{ note.message|truncatewords:15 }}</p>
+        <small>{{ note.created_at|date:"M d, Y h:i A" }}</small>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p class="text-center" style="font-size: 0.85rem; color: #555;">{% trans "No messages available." %}</p>
+  {% endif %}
+</div>
+
+<!-- Modal for Full Message Details -->
+<div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="background-color: #1e1e1e; border-radius: 12px;">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-white" id="messageModalLabel" style="font-weight: 600;"></h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4 text-white" style="font-size: 0.9rem;">
+        <p id="messageContent"></p>
+        <p id="messageDate" style="font-size: 0.75rem; color: #ccc;"></p>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal" style="border-radius: 8px; font-size: 0.8rem;">
+          {% trans "Close" %}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    let messageModal = new bootstrap.Modal(document.getElementById('messageModal'));
+    document.querySelectorAll(".card").forEach(function(card) {
+      card.addEventListener("click", function() {
+        let messageId = this.getAttribute("data-id");
+        let title = this.getAttribute("data-title");
+        let message = this.getAttribute("data-message");
+        let date = this.getAttribute("data-date");
+
+        // Set modal content
+        document.getElementById("messageModalLabel").textContent = title;
+        document.getElementById("messageContent").textContent = message;
+        document.getElementById("messageDate").textContent = "Last Update: " + date;
+
+        // Mark the message as read via AJAX
+        fetch(`/notifications/mark-read/${messageId}/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === "success") {
+            card.classList.remove("unread");
+            card.classList.add("read");
+          }
+        })
+        .catch(error => console.error("Error marking message as read:", error));
+
+        // Show the modal
+        messageModal.show();
+      });
+    });
+  });
+</script>
+{% endblock %}

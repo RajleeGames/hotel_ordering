@@ -5,9 +5,9 @@
 {% block title %}Menu{% endblock %}
 
 {% block content %}
-<!-- Global Light Background -->
+<!-- Global Light Background & Font -->
 <style>
-  body, .container, .carousel, .food-list, .mobile-category-buttons {
+  body, .container, .banner-container, .food-list, .mobile-category-buttons {
     background-color: #fff !important;
   }
   body {
@@ -39,12 +39,14 @@
   </script>
 {% endif %}
 
-<!-- LARGE SEARCH BAR (Auto-Submit) placed above the sliding banner -->
-<div class="search-container container my-4">
-  <form method="GET" action="{% url 'menu' %}" class="row g-3 justify-content-center align-items-center" id="autoSearchForm">
+<!-- LARGE SEARCH BAR (Fancy & Auto-Submit) -->
+<div class="search-container" style="margin-bottom: 0 !important; padding: 10px;">
+  <form method="GET" action="{% url 'menu' %}" class="row g-0 justify-content-center align-items-center" id="autoSearchForm"> 
     <div class="col-md-10">
-      <div class="input-group input-group-lg shadow" style="border-radius: 30px; overflow: hidden; background-color: #f0f0f0;">
-        <span class="input-group-text bg-white border-0" style="color: #FF6600;">
+      <div class="input-group shadow" 
+           style="border-radius: 30px; overflow: hidden; background: linear-gradient(135deg, #FF8C00, #FF6600);">
+        <span class="input-group-text border-0" 
+              style="background: white; color: #FF6600; padding: 12px 15px; font-size: 1.2rem;">
           <i class="fas fa-search"></i>
         </span>
         <input 
@@ -52,9 +54,9 @@
           name="q" 
           value="{{ query }}" 
           class="form-control border-0 search-input" 
-          placeholder="Search for food items..." 
-          style="box-shadow: none; font-size: 1rem; background-color: #f0f0f0; color: #333;"
+          placeholder="Search for delicious food..." 
           id="searchInput"
+          style="box-shadow: none; font-size: 1rem; background: white; color: #333; padding: 12px;"
         >
       </div>
     </div>
@@ -62,45 +64,17 @@
 </div>
 
 <script>
-  // Debounce function to limit auto-submission frequency
-  function debounce(func, wait) {
-    let timeout;
-    return function(...args) {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func.apply(this, args), wait);
-    };
-  }
-  const searchInput = document.getElementById("searchInput");
-  const autoSearchForm = document.getElementById("autoSearchForm");
-  if (searchInput) {
-    // Auto-submit 400ms after user stops typing
-    searchInput.addEventListener("input", debounce(function() {
-      autoSearchForm.submit();
-    }, 400));
-  }
+  // Auto-submit the search form on input (debounced if needed)
+  document.getElementById("searchInput").addEventListener("input", function() {
+    document.getElementById("autoSearchForm").submit();
+  });
 </script>
 
-<!-- SLIDING BANNER (Bootstrap Carousel with 3 images) -->
-<div id="bannerCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
-  <div class="carousel-inner">
-    <div class="carousel-item active">
-      <img src="{% static 'images/banner1.jpg' %}" class="d-block w-100" alt="Banner 1" style="border-radius: 12px;">
-    </div>
-    <div class="carousel-item">
-      <img src="{% static 'images/banner2.jpg' %}" class="d-block w-100" alt="Banner 2" style="border-radius: 12px;">
-    </div>
-    <div class="carousel-item">
-      <img src="{% static 'images/banner3.jpg' %}" class="d-block w-100" alt="Banner 3" style="border-radius: 12px;">
-    </div>
-  </div>
-  <button class="carousel-control-prev" type="button" data-bs-target="#bannerCarousel" data-bs-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">{% trans "Previous" %}</span>
-  </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#bannerCarousel" data-bs-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">{% trans "Next" %}</span>
-  </button>
+<br>
+
+<!-- SINGLE BANNER IMAGE -->
+<div class="banner-container mb-4">
+  <img src="{% static 'images/banner.png' %}" class="d-block w-100" alt="Banner" style="border-radius: 12px;">
 </div>
 
 <!-- Mobile Category Buttons (Horizontally Scrollable) -->
@@ -179,32 +153,16 @@
   }
 </style>
 
-<!-- Track Your Order & Review Links (if user is non-staff and order exists) -->
-{% if user.is_authenticated and not user.is_staff and order %}
-  <div class="text-center mb-4">
-    <div class="d-flex flex-wrap justify-content-center gap-3">
-      <a href="{% url 'track_order' order.id %}" 
-         class="btn btn-warning animate__animated animate__pulse animate__infinite glow-button">
-        Track Your Order
-      </a>
-      <a href="{% url 'customer_reviews' %}" 
-         class="btn btn-info animate__animated animate__pulse animate__infinite glow-button">
-        Leave a Review
-      </a>
-    </div>
-  </div>
-{% endif %}
-
 <!-- Clear Search Button (if search query exists) -->
 {% if query or selected_category %}
   <div class="row mb-4">
-    <div class="col-12">
+    <div class="col-12 text-center">
       <a href="{% url 'menu' %}" class="btn btn-secondary glow-button">Clear Search</a>
     </div>
   </div>
 {% endif %}
 
-<!-- Food Items Listing (Light Rows with Favorite and Add to Cart) -->
+<!-- Food Items Listing -->
 {% if not grouped %}
   <h2 class="mb-3" style="color: #333;">Search Results</h2>
   <div class="food-list">
@@ -343,5 +301,80 @@
     </div>
   {% endfor %}
 {% endif %}
-
 {% endblock %}
+
+{% block extra_scripts %}
+<!-- Google Maps API Script (Replace with your API key) -->
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY"></script>
+
+{% if order and order.id %}
+<script>
+  let map;
+  let marker;
+  let prevStatus = "{{ order.status }}";
+
+  // Request notification permission (optional)
+  if ("Notification" in window) {
+    Notification.requestPermission().then(permission => {
+      console.log("Notification permission:", permission);
+    });
+  }
+
+  // Initialize the map with default coordinates (0,0) or real values if available
+  function initMap(lat = 0, lng = 0) {
+    const center = { lat: lat, lng: lng };
+    map = new google.maps.Map(document.getElementById("map"), {
+      center: center,
+      zoom: 14,
+    });
+    marker = new google.maps.Marker({
+      position: center,
+      map: map,
+    });
+  }
+
+  // Update marker on the map
+  function updateMap(lat, lng) {
+    const newPos = { lat: lat, lng: lng };
+    marker.setPosition(newPos);
+    map.setCenter(newPos);
+  }
+
+  // Show notification if order status changes
+  function showOrderNotification(newStatus) {
+    console.log("Order status changed to:", newStatus);
+    alert(`Your order status changed to: ${newStatus}`);
+    if ("Notification" in window && Notification.permission === "granted") {
+      new Notification("Order Update", {
+        body: `Your order is now: ${newStatus}`,
+        icon: "{% static 'images/notification_icon.png' %}"
+      });
+    }
+  }
+
+  // Poll the server for order updates
+  function fetchOrderStatus() {
+    fetch("{% url 'order_status_api' order.id %}")
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          console.error("Error fetching order status:", data.error);
+          return;
+        }
+        if (data.driver_lat && data.driver_lng) {
+          updateMap(data.driver_lat, data.driver_lng);
+        }
+        if (data.status !== prevStatus) {
+          showOrderNotification(data.status);
+          prevStatus = data.status;
+        }
+      })
+      .catch(error => console.error("Error:", error));
+  }
+
+  initMap();
+  fetchOrderStatus();
+  setInterval(fetchOrderStatus, 15000);
+</script>
+{% endif %}
+{% endblock extra_scripts %}

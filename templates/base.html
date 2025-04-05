@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}{% trans "Taifa Food " %}{% endblock %}</title>
+  <title>{% block title %}{% trans "Taifa Food" %}{% endblock %}</title>
   
   <!-- Bootstrap CSS via CDN -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -19,52 +19,28 @@
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   
-  <!-- Custom CSS (if you want additional styling, you can also use an external file) -->
+  <!-- Custom CSS -->
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
   
   <style>
-    /* Offcanvas: Custom width and style */
-    .offcanvas-custom {
-      width: 80% !important;
-      max-width: 350px;
-      left: 50%;
-      transform: translateX(-50%);
-      border-radius: 0 20px 20px 20px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+    
+    /* Global Styles */
+    body {
+      margin: 0;
+      padding-top: 60px; /* Space for fixed navbar */
+      background-color: #f9f9f9;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.85rem;
     }
-    @media (min-width: 992px) {
-      .offcanvas-custom {
-        width: 320px !important;
-      }
-    }
-    .offcanvas-header {
-      background-color: #FF6600;
-      color: #fff;
-      padding: 2rem 1rem;
-      border-top-right-radius: 20px;
-      border-bottom-right-radius: 20px;
-      position: relative;
-      text-align: center;
-      animation: slideInLeft 1s ease-out;
-    }
-    .sidebar-close-arrow {
-      position: absolute;
-      top: 10px;
-      left: 15px;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: #fff;
-      transition: transform 0.3s;
-    }
-    .sidebar-close-arrow:hover {
-      transform: rotate(-90deg);
+    .container {
+      padding-bottom: 70px; /* Ensure content doesn't hide behind footer */
     }
     
-    /* Navbar Styling */
+    /* Top Navbar */
     .navbar {
       background-color: #fff !important;
       border-bottom: 1px solid #eee;
-      margin: 0;
       padding: 0.5rem 1rem;
       position: fixed;
       top: 0;
@@ -95,13 +71,7 @@
       margin-right: 6px;
     }
     
-    /* Body offset for the fixed navbar so content isn't hidden */
-    body {
-      margin: 0;
-      padding-top: 60px;
-      background-color: #f9f9f9;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
+    /* Banner Styling */
     .banner-container {
       margin: 1rem auto;
       max-width: 800px;
@@ -145,16 +115,12 @@
       to { transform: rotate(360deg); }
     }
     
-    @keyframes slideInLeft {
-      from { transform: translateX(-100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-    
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
     }
     
+    /* Footer & Bottom Navigation */
     footer {
       background-color: #FF6600;
       color: #fff;
@@ -169,201 +135,111 @@
     footer a:hover {
       color: #ffe6cc;
     }
+    
+    .bottom-nav {
+      background-color: #fff;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1050;
+      border-top: 1px solid #ddd;
+      display: flex;
+      justify-content: space-around;
+      padding: 6px 0;
+    }
+    .bottom-nav-item {
+      text-align: center;
+      color: #333;
+      font-size: 0.75rem;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .bottom-nav-item:hover {
+      color: #FF6600;
+    }
+    .bottom-nav-item .nav-icon {
+      font-size: 1.2rem;
+      display: block;
+      margin-bottom: 2px;
+    }
+    .badge {
+      font-size: 0.65rem;
+      padding: 2px 4px;
+      border-radius: 50%;
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
   </style>
 </head>
 <body>
-
   <!-- TOP NAVBAR -->
-  <nav class="navbar navbar-expand d-flex align-items-center">
-    <div class="container-fluid d-flex align-items-center justify-content-between">
-      <!-- Hamburger + Brand on left -->
-      <div class="d-flex align-items-center">
-        <button class="btn btn-link p-0 me-2" 
-                type="button" 
-                data-bs-toggle="offcanvas" 
-                data-bs-target="#sidebarMenu" 
-                aria-controls="sidebarMenu"
-                style="color: #FF6600; font-size: 1.8rem;">
-          <i class="fas fa-bars"></i>
-        </button>
-        <a class="navbar-brand" href="{% url 'menu' %}">{% trans "Taifa Food" %}</a>
-      </div>
-      <!-- Right side: user profile and messages link -->
-      <ul class="navbar-nav ms-auto">
+  <nav class="navbar">
+    <div class="container-fluid d-flex justify-content-between align-items-center">
+      <!-- Brand on left -->
+      <a class="navbar-brand" href="{% url 'menu' %}">{% trans "Taifa Food" %}</a>
+      <!-- Right side: user profile -->
+      <ul class="navbar-nav">
         {% if user.is_authenticated %}
-          {% if user.profile.profile_picture %}
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'profile' %}">
-                <img src="{{ user.profile.profile_picture.url }}" 
-                     alt="{% trans 'Profile' %}"
-                     style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid #FF6600;">
-                {{ user.username }}
-              </a>
-            </li>
-          {% else %}
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'profile' %}">
-                <i class="fa fa-user-circle"></i>{% trans "Login" %}
-              </a>
-            </li>
-          {% endif %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'profile_site' %}">
+              {% if user.profile.profile_picture %}
+                <img src="{{ user.profile.profile_picture.url }}" alt="{% trans 'Profile' %}" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid #FF6600;">
+              {% else %}
+                <i class="fa fa-user-circle"></i>
+              {% endif %}
+              {{ user.username }}
+            </a>
+          </li>
         {% else %}
           <li class="nav-item">
             <a class="nav-link" href="{% url 'login' %}">
-              <i class="fa fa-user-circle"></i>{% trans "Login" %}
+              <i class="fa fa-user-circle"></i> {% trans "Login" %}
             </a>
           </li>
         {% endif %}
-        <!-- Messages Link -->
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'messages' %}">
-            <i class="fas fa-envelope"></i> {% trans "Messages" %}
-          </a>
-        </li>
       </ul>
     </div>
   </nav>
   
-  <!-- OFFCANVAS SIDEBAR -->
-  <div class="offcanvas offcanvas-start offcanvas-custom" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
-    <!-- SIDEBAR HEADER -->
-    <div class="offcanvas-header">
-      <i class="fa fa-arrow-left sidebar-close-arrow" data-bs-dismiss="offcanvas"></i>
-      <h4 class="mb-2 fw-bold" style="font-size: 1.4rem;">{% trans "Taifa Food" %}</h4>
-      {% if user.is_authenticated %}
-        {% if user.profile.profile_picture %}
-          <div class="text-white">
-            <img src="{{ user.profile.profile_picture.url }}" 
-                 alt="{% trans 'Profile' %}"
-                 style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; margin-right: 8px;">
-            {{ user.username }}
-          </div>
-        {% else %}
-          <div class="text-white">
-            <i class="fa fa-user-circle me-2"></i> {{ user.username }}
-          </div>
-        {% endif %}
-      {% else %}
-        <a href="{% url 'login' %}" class="btn btn-outline-light glow-button" style="font-weight: 600; border-radius: 30px; padding: 0.5rem 1rem;">
-          <i class="fa fa-user-circle me-1"></i>{% trans "Login" %}
-        </a>
-      {% endif %}
-    </div>
-    
-    <!-- SIDEBAR BODY -->
-    <div class="offcanvas-body bg-white text-dark">
-      <ul class="list-unstyled">
-        <!-- Menu Link -->
-        <li class="mb-3">
-          <a href="{% url 'menu' %}" class="d-flex align-items-center text-decoration-none text-dark">
-            <i class="fa fa-utensils me-2"></i> {% trans "Menu" %}
-          </a>
-        </li>
-        <!-- Cart Link -->
-        <li class="mb-3">
-          <a href="{% url 'view_cart' %}" class="d-flex align-items-center text-decoration-none text-dark">
-            <i class="fa fa-shopping-cart me-2"></i> {% trans "Cart" %}
-          </a>
-        </li>
-        <!-- Messages Link -->
-        <li class="mb-3">
-          <a href="{% url 'messages' %}" class="d-flex align-items-center text-decoration-none text-dark">
-            <i class="fa fa-envelope me-2"></i> {% trans "Messages" %}
-          </a>
-        </li>
-        <hr>
-        <!-- Change Language -->
-        <li class="mb-3">
-          <form action="{% url 'set_language' %}" method="post">
-            {% csrf_token %}
-            <input name="next" type="hidden" value="{{ request.get_full_path }}">
-            <div class="d-flex align-items-center">
-              <i class="fa fa-globe me-2"></i>
-              <select name="language" class="form-select" onchange="this.form.submit()" style="border: none; box-shadow: none; font-weight: 600; color: #333;">
-                {% get_current_language as LANGUAGE_CODE %}
-                {% get_available_languages as languages %}
-                {% for lang, lang_name in languages %}
-                  <option value="{{ lang }}" {% if lang == LANGUAGE_CODE %}selected{% endif %}>{{ lang_name }}</option>
-                {% endfor %}
-              </select>
-            </div>
-          </form>
-        </li>
-        <!-- Customer Support -->
-        <li class="mb-3">
-          <a href="{% url 'customer_support' %}" class="d-flex align-items-center text-decoration-none text-dark">
-            <i class="fa fa-headset me-2"></i> {% trans "Customer Support" %}
-          </a>
-        </li>
-        <hr>
-        <!-- Profile / Logout (if authenticated) -->
-        {% if user.is_authenticated %}
-          <li class="mb-3">
-            <a href="{% url 'profile' %}" class="d-flex align-items-center text-decoration-none text-dark">
-              <i class="fa fa-user-cog me-2"></i> {% trans "Profile" %}
-            </a>
-          </li>
-          {% if user.is_staff %}
-            <li class="mb-3">
-              <a href="{% url 'manage_orders' %}" class="d-flex align-items-center text-decoration-none text-dark">
-                <i class="fa fa-tasks me-2"></i> {% trans "Manage Orders" %}
-              </a>
-            </li>
-            <!-- Staff-Only: Manage Reviews -->
-            <li class="mb-3">
-              <a href="{% url 'manage_reviews' %}" class="d-flex align-items-center text-decoration-none text-dark">
-                <i class="fa fa-star me-2"></i> {% trans "Manage Reviews" %}
-              </a>
-            </li>
-          {% endif %}
-          <li class="mb-3">
-            <a href="{% url 'logout' %}" class="d-flex align-items-center text-decoration-none text-dark">
-              <i class="fa fa-sign-out-alt me-2"></i> {% trans "Logout" %}
-            </a>
-          </li>
-        {% endif %}
-      </ul>
-    </div>
-  </div>
-  
   <!-- MAIN CONTENT -->
   <div class="container mt-4">
-    {% block content %}{% endblock content %}
+    {% block content %}{% endblock %}
   </div>
+  
+  <!-- BOTTOM NAVIGATION (Footer) -->
+  <nav class="bottom-nav">
+    <a href="{% url 'menu' %}" class="bottom-nav-item">
+      <i class="fas fa-home nav-icon"></i>
+      <span>Home</span>
+    </a>
+    <a href="{% url 'my_orders' %}" class="bottom-nav-item">
+      <i class="fas fa-receipt nav-icon"></i>
+      <span>My Orders</span>
+    </a>
+    <a href="{% url 'view_cart' %}" class="bottom-nav-item position-relative">
+      <i class="fas fa-shopping-cart nav-icon"></i>
+      <span>Cart</span>
+      {% if cart_item_count and cart_item_count > 0 %}
+        <span class="badge bg-danger">{{ cart_item_count }}</span>
+      {% endif %}
+    </a>
+    <a href="{% url 'messages' %}" class="bottom-nav-item position-relative">
+      <i class="fas fa-envelope nav-icon"></i>
+      <span>Messages</span>
+      {% if notifications_count and notifications_count > 0 %}
+        <span class="badge bg-danger">{{ notifications_count }}</span>
+      {% endif %}
+    </a>
+    <a href="{% url 'profile_site' %}" class="bottom-nav-item">
+      <i class="fas fa-user nav-icon"></i>
+      <span>Profile</span>
+    </a>    
+  </nav>
   
   <!-- BOOTSTRAP JS (includes Popper) -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  
-  {% block extra_scripts %}{% endblock extra_scripts %}
-  
-  <script>
-    // Example Notification function (if needed)
-    function testNotification() {
-      if ("Notification" in window) {
-        if (Notification.permission !== "granted") {
-          Notification.requestPermission().then(permission => {
-            if (permission === "granted") {
-              createTestNotification();
-            } else {
-              alert("{% trans 'Notification permission was denied.' %}");
-            }
-          });
-        } else {
-          createTestNotification();
-        }
-      } else {
-        alert("{% trans 'This browser does not support desktop notifications.' %}");
-      }
-    }
-  
-    function createTestNotification() {
-      new Notification("{% trans 'Test Notification' %}", {
-        body: "{% trans 'This is a test notification from Taifa Food.' %}",
-        icon: "{% static 'images/notification_icon.png' %}"
-      });
-      let countElem = document.getElementById("notificationCount");
-      countElem.textContent = parseInt(countElem.textContent) + 1;
-    }
-  </script>
+  {% block extra_scripts %}{% endblock %}
 </body>
 </html>

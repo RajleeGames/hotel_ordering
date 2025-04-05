@@ -7,74 +7,120 @@ Track Your Order
 
 {% block content %}
 <style>
-  /* Make the map smaller on very small screens */
-  @media (max-width: 576px) {
-    #map {
-      height: 300px;
-    }
+  /* Global Styles for Track Your Order Page */
+  .track-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    font-family: 'Poppins', sans-serif;
+    color: #333;
   }
-  /* Optional: styling for the driver image to be circular */
+  .track-header {
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  .order-info {
+    font-size: 0.9rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  .order-info strong {
+    font-weight: 600;
+  }
+  .driver-card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .driver-card h5 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  .driver-card p {
+    font-size: 0.85rem;
+    margin-bottom: 0.4rem;
+  }
+  .driver-card .btn-call {
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-top: 0.5rem;
+    border-radius: 8px;
+  }
+  /* Circular Driver Image */
   .driver-img {
     width: 100px;
     height: 100px;
     object-fit: cover;
     border-radius: 50%;
+    border: 2px solid #eee;
+    margin-bottom: 0.5rem;
+  }
+  /* Map Styles */
+  #map {
+    width: 100%;
+    height: 400px;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    margin-top: 1rem;
+  }
+  /* Responsive: make the map shorter on very small screens */
+  @media (max-width: 576px) {
+    #map {
+      height: 300px;
+    }
   }
 </style>
 
-<div class="container my-5">
-  <div class="row justify-content-center">
-    <div class="col-12 col-md-8">
-      <div class="card shadow-sm mb-4">
-        <div class="card-body text-center">
-          <h1 class="card-title mb-4">Order #{{ order.id }} Tracking</h1>
-
-          <p class="card-text mb-1">
-            <strong>Status:</strong>
-            <span id="order-status">{{ order.status }}</span>
-          </p>
-
-          <p class="card-text mb-3">
-            <strong>Total Price:</strong> 
-            Tsh<span id="order-price">{{ order.total_price }}</span>
-          </p>
-
-          <!-- Single Default Driver Card -->
-          <div class="card shadow-sm mb-3">
-            <div class="card-body text-center">
-              <h5 class="mb-3">Delivery Person</h5>
-              
-              {% if driver %}
-                {% if driver.image %}
-                  <img src="{{ driver.image.url }}" alt="Driver" class="driver-img mb-2">
-                {% else %}
-                  <img src="{% static 'images/default_driver.png' %}" alt="Driver" class="driver-img mb-2">
-                {% endif %}
-
-                <p class="mb-1"><strong>Name:</strong> {{ driver.name }}</p>
-                <p class="mb-1"><strong>Phone:</strong> {{ driver.phone }}</p>
-                
-                <!-- Call Button (tel: link) -->
-                <a href="tel:{{ driver.phone }}" class="btn btn-success mt-2">
-                  <i class="fa fa-phone"></i> Call Driver
-                </a>
-              {% else %}
-                <p>No default driver is set.</p>
-              {% endif %}
-            </div>
-          </div>
-
-          <!-- Responsive Map Container -->
-          <div id="map" class="rounded border" style="width: 100%; height: 400px;"></div>
-        </div>
+<div class="container track-container">
+  <div class="card shadow-sm">
+    <div class="card-body text-center">
+      <h1 class="track-header">Order #{{ order.id }} Tracking</h1>
+      
+      <div class="order-info">
+        <p>
+          <strong>Status:</strong> 
+          <span id="order-status">{{ order.status }}</span>
+        </p>
+        <p>
+          <strong>Total Price:</strong> 
+          Tsh<span id="order-price">{{ order.total_price }}</span>
+        </p>
       </div>
+      
+      <!-- Driver Card -->
+      <div class="driver-card mb-4">
+        <h5>Delivery Person</h5>
+        {% if driver %}
+          {% if driver.image %}
+            <img src="{{ driver.image.url }}" alt="Driver" class="driver-img">
+          {% else %}
+            <img src="{% static 'images/default_driver.png' %}" alt="Driver" class="driver-img">
+          {% endif %}
+          <p><strong>Name:</strong> {{ driver.name }}</p>
+          <p><strong>Phone:</strong> {{ driver.phone }}</p>
+          <!-- Call Button -->
+          <a href="tel:{{ driver.phone }}" class="btn btn-success btn-call">
+            <i class="fa fa-phone"></i> Call Driver
+          </a>
+        {% else %}
+          <p>No default driver is set.</p>
+        {% endif %}
+      </div>
+      
+      <!-- Map Container -->
+      <div id="map" class="rounded"></div>
     </div>
   </div>
 </div>
 {% endblock content %}
 
 {% block extra_scripts %}
-<!-- Replace with your actual Google Maps API key -->
+<!-- Google Maps API Script (Replace with your API key) -->
 <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY"></script>
 
 <script>
@@ -82,17 +128,14 @@ Track Your Order
   let marker;
   let prevStatus = "{{ order.status }}";
 
-  // Request permission for browser notifications
+  // Request permission for browser notifications (optional)
   if ("Notification" in window) {
     Notification.requestPermission().then(permission => {
       console.log("Notification permission:", permission);
-      // If needed, test notifications here:
-      // if (permission === "granted") showOrderNotification("Test Status");
     });
   }
 
-  // Initialize the map with a default location (0,0)
-  // or real coords if you store them in the order
+  // Initialize the map with a default location (0,0) or real coordinates if stored in order
   function initMap(lat = 0, lng = 0) {
     const center = { lat: lat, lng: lng };
     map = new google.maps.Map(document.getElementById("map"), {
@@ -112,17 +155,14 @@ Track Your Order
     map.setCenter(newPos);
   }
 
-  // Show a notification with an icon and an in-page alert
+  // Show notification and in-page alert if order status changes
   function showOrderNotification(newStatus) {
-    console.log("Showing notification for status:", newStatus);
-    // Basic in-page alert
+    console.log("Order status changed to:", newStatus);
     alert(`Your order status changed to: ${newStatus}`);
-
-    // Browser notification
     if ("Notification" in window && Notification.permission === "granted") {
       new Notification("Order Update", {
         body: `Your order is now: ${newStatus}`,
-        icon: "{% static 'images/notification_icon.png' %}" // adjust path as needed
+        icon: "{% static 'images/notification_icon.png' %}"
       });
     }
   }
@@ -136,17 +176,15 @@ Track Your Order
           console.error("Error fetching order status:", data.error);
           return;
         }
-        // Update status text and price
+        // Update order status and total price in the page
         document.getElementById("order-status").textContent = data.status;
         document.getElementById("order-price").textContent = data.total_price.toFixed(2);
-
-        // If status changed, show notification
+        // If order status changed, notify user
         if (data.status !== prevStatus) {
           showOrderNotification(data.status);
           prevStatus = data.status;
         }
-
-        // Update map if driver coordinates are available
+        // Update map position if driver coordinates exist
         if (data.driver_lat && data.driver_lng) {
           updateMap(data.driver_lat, data.driver_lng);
         }
@@ -154,13 +192,11 @@ Track Your Order
       .catch(error => console.error("Error:", error));
   }
 
-  // Initialize the map
+  // Initialize map on page load
   initMap();
-
-  // Fetch the latest order status immediately on load
+  // Fetch latest order status immediately
   fetchOrderStatus();
-
-  // Poll for order updates every 15 seconds
+  // Poll every 15 seconds for updates
   setInterval(fetchOrderStatus, 15000);
 </script>
 {% endblock extra_scripts %}

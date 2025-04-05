@@ -1,15 +1,70 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Order Confirmation{% endblock %}
+
 {% block content %}
-<div class="container mt-5">
-  <div class="card shadow">
-    <div class="card-header bg-primary text-white">
+<style>
+  /* Inline styles for advanced customization */
+  .order-card {
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    animation: fadeInUp 0.8s ease-out;
+  }
+  .order-header {
+    background: linear-gradient(135deg, #ff6600, #ff9933);
+    padding: 1.5rem;
+    text-align: center;
+    color: #fff;
+    position: relative;
+  }
+  .order-header::after {
+    content: "";
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-top: 20px solid #fff;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+  }
+  .order-body {
+    background-color: #fff;
+    padding: 2rem;
+  }
+  .order-summary h5 {
+    color: #333;
+    border-bottom: 2px solid #ff6600;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  .list-group-item {
+    border: none;
+    border-bottom: 1px dashed #ddd;
+  }
+  .list-group-item:last-child {
+    border-bottom: none;
+  }
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+
+<div class="container my-5">
+  <div class="card order-card">
+    <div class="order-header">
       <h2 class="mb-0">Order Confirmation</h2>
+      <p class="mt-2" style="font-size: 1.1rem;">We appreciate your business!</p>
     </div>
-    <div class="card-body">
-      <p class="lead">Thank you for your order!</p>
-      <hr>
-      <div class="mb-3">
+    <div class="order-body">
+      <div class="order-summary mb-4">
         <h5>Order Summary</h5>
         <p><strong>Order ID:</strong> {{ order.id }}</p>
         {% if order.user %}
@@ -17,19 +72,19 @@
         {% endif %}
       </div>
       <div class="mb-4">
-        <h6>Items Ordered:</h6>
+        <h5 class="mb-3">Items Ordered</h5>
         <div class="list-group">
           {% for item in order.items.all %}
           <div class="list-group-item">
             <div class="row align-items-center">
               <div class="col-md-6">
-                <h5 class="mb-1">{{ item.food_item.name }}</h5>
+                <h6 class="mb-1 text-dark">{{ item.food_item.name }}</h6>
               </div>
               <div class="col-md-3 text-center">
-                <span class="badge bg-secondary p-2">{{ item.quantity }}</span>
+                <span class="badge bg-secondary p-2" style="font-size: 0.9rem;">Qty: {{ item.quantity }}</span>
               </div>
               <div class="col-md-3 text-end">
-                <h5 class="mb-0">Tsh{{ item.price }}</h5>
+                <h6 class="mb-0 text-dark">Tsh{{ item.price }}</h6>
               </div>
             </div>
           </div>
@@ -41,7 +96,9 @@
         </div>
       </div>
       <div class="text-end">
-        <a class="btn btn-outline-primary" href="{% url 'menu' %}">Back to Menu</a>
+        <a class="btn btn-outline-primary" href="{% url 'menu' %}" style="font-weight: 600;">
+          <i class="bi bi-arrow-left-circle"></i> Back to Menu
+        </a>
       </div>
     </div>
   </div>

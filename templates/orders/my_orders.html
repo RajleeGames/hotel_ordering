@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "My Orders" %}{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+  <h2 class="mb-3 order-title">{% trans "My Orders" %}</h2>
+
+  <!-- Filter Form -->
+  <form class="order-filter-form mb-3">
+    <div class="row g-2 align-items-end">
+      <div class="col-auto">
+        <label for="order_id" class="form-label small">{% trans "Order ID" %}</label>
+        <input type="text" name="order_id" id="order_id" value="{{ request.GET.order_id }}" class="form-control form-control-sm">
+      </div>
+      <div class="col-auto">
+        <label for="status" class="form-label small">{% trans "Status" %}</label>
+        <select name="status" id="status" class="form-select form-select-sm">
+          <option value="">{% trans "All" %}</option>
+          <option value="Pending">{% trans "Pending" %}</option>
+          <option value="Completed">{% trans "Completed" %}</option>
+          <option value="Cancelled">{% trans "Cancelled" %}</option>
+        </select>
+      </div>
+    </div>
+  </form>
+
+  <!-- Orders Table -->
+  <table class="table table-bordered table-hover table-sm">
+    <thead class="table-light">
+      <tr>
+        <th>{% trans "Order ID" %}</th>
+        <th>{% trans "Date" %}</th>
+        <th>{% trans "Total" %}</th>
+        <th>{% trans "Status" %}</th>
+        <th>{% trans "Details" %}</th>
+      </tr>
+    </thead>
+    <tbody id="orders-table-body">
+      {% for order in orders %}
+      <tr>
+        <td>{{ order.id }}</td>
+        <td>{{ order.created_at|date:"M d, Y" }}</td>
+        <td>{{ order.total_price }}</td>
+        <td>
+          {% if order.status == "Completed" %}
+            <span class="badge bg-success small">{% trans "Completed" %}</span>
+          {% elif order.status == "Pending" %}
+            <span class="badge bg-warning small">{% trans "Pending" %}</span>
+          {% elif order.status == "Cancelled" %}
+            <span class="badge bg-danger small">{% trans "Cancelled" %}</span>
+          {% else %}
+            {{ order.status }}
+          {% endif %}
+        </td>
+        <td>
+          <a href="{% url 'order_detail' order.id %}" class="btn btn-sm btn-primary">{% trans "View" %}</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <p id="no-orders-message" class="text-center text-muted small" style="display: none;">
+    {% trans "No orders found." %}
+  </p>
+</div>
+
+<!-- JavaScript for Live Filtering -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    let orderIDInput = document.getElementById("order_id");
+    let statusSelect = document.getElementById("status");
+    let ordersTableBody = document.getElementById("orders-table-body");
+    let noOrdersMessage = document.getElementById("no-orders-message");
+
+    function fetchOrders() {
+      let orderID = orderIDInput.value;
+      let status = statusSelect.value;
+      let url = `{% url 'my_orders' %}?order_id=${orderID}&status=${status}`;
+
+      fetch(url, {
+        headers: {
+          "X-Requested-With": "XMLHttpRequest"
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        ordersTableBody.innerHTML = "";
+
+        if (data.orders.length === 0) {
+          noOrdersMessage.style.display = "block";
+        } else {
+          noOrdersMessage.style.display = "none";
+          data.orders.forEach(order => {
+            let statusBadge = "";
+            if (order.status === "Completed") {
+              statusBadge = `<span class="badge bg-success small">{% trans "Completed" %}</span>`;
+            } else if (order.status === "Pending") {
+              statusBadge = `<span class="badge bg-warning small">{% trans "Pending" %}</span>`;
+            } else if (order.status === "Cancelled") {
+              statusBadge = `<span class="badge bg-danger small">{% trans "Cancelled" %}</span>`;
+            } else {
+              statusBadge = order.status;
+            }
+
+            let row = `
+              <tr>
+                <td>${order.id}</td>
+                <td>${order.date}</td>
+                <td>${order.total_price}</td>
+                <td>${statusBadge}</td>
+                <td><a href="${order.detail_url}" class="btn btn-sm btn-primary">{% trans "View" %}</a></td>
+              </tr>
+            `;
+            ordersTableBody.innerHTML += row;
+          });
+        }
+      });
+    }
+
+    // Auto-fetch orders when input changes
+    orderIDInput.addEventListener("keyup", fetchOrders);
+    statusSelect.addEventListener("change", fetchOrders);
+  });
+</script>
+
+<style>
+  .order-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+  }
+  .order-filter-form .form-label {
+    margin-bottom: 0.25rem;
+  }
+  .order-filter-form input,
+  .order-filter-form select {
+    font-size: 0.8rem;
+  }
+  .table {
+    font-size: 0.8rem;
+  }
+</style>
+{% endblock %}

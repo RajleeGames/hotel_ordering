@@ -1,34 +1,208 @@
-{% extends 'base.html' %}
-{% load static %}
-{% block title %}Login{% endblock %}
-{% block content %}
-<div class="two-panel-container">
-  <!-- Left Panel -->
-  <div class="two-panel-left">
-    <h2>Welcome Back!</h2>
-    <p>Don't have an account?</p>
-    <a href="{% url 'register' %}" class="btn-outlined">Register</a>
-  </div>
-  <!-- Right Panel -->
-  <div class="two-panel-right">
-    <div class="login-form">
-      <h2>Login</h2>
-      <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn-solid">Login</button>
-      </form>
-      <div class="extra-links">
-        <a href="#">Forgot Password?</a>
-      </div>
-      <p class="or">or login with</p>
-      <div class="social-icons">
-        <a href="#"><img src="{% static 'images/google.png' %}" alt="Google"></a>
-        <a href="#"><img src="{% static 'images/facebook.png' %}" alt="Facebook"></a>
-        <a href="#"><img src="{% static 'images/github.png' %}" alt="GitHub"></a>
-        <a href="#"><img src="{% static 'images/linkedin.png' %}" alt="LinkedIn"></a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login - Taifa Food</title>
+  {% load static %}
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: #f4f4f4;
+    }
+    .two-panel-container {
+      display: flex;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    .two-panel-left,
+    .two-panel-right {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      transition: all 0.5s ease;
+    }
+    /* Left panel with gradient background and overlay */
+    .two-panel-left {
+      background: linear-gradient(135deg, #C3563F, #e66b55);
+      color: #fff;
+      flex-direction: column;
+      text-align: center;
+    }
+    .two-panel-left h2 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+    }
+    .two-panel-left p {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    }
+    .btn-outlined {
+      border: 2px solid #fff;
+      color: #fff;
+      padding: 12px 25px;
+      text-decoration: none;
+      border-radius: 30px;
+      font-weight: 600;
+      transition: background 0.3s, color 0.3s;
+    }
+    .btn-outlined:hover {
+      background: #fff;
+      color: #C3563F;
+    }
+    /* Right panel styling */
+    .two-panel-right {
+      background: #fff;
+      flex-direction: column;
+      box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+      animation: slideIn 0.7s ease-out;
+    }
+    @keyframes slideIn {
+      from { transform: translateX(50px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    .login-form {
+      width: 100%;
+      max-width: 400px;
+      padding: 40px 30px;
+      border-radius: 10px;
+      background: #fff;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      animation: fadeIn 1s ease-in;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .login-form h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+      font-weight: 600;
+    }
+    .login-form form {
+      margin-bottom: 20px;
+    }
+    .login-form form p {
+      margin: 15px 0;
+    }
+    /* Fancy inputs */
+    .login-form input[type="text"],
+    .login-form input[type="password"] {
+      width: 100%;
+      padding: 15px 20px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border 0.3s, box-shadow 0.3s;
+    }
+    .login-form input[type="text"]:focus,
+    .login-form input[type="password"]:focus {
+      outline: none;
+      border-color: #C3563F;
+      box-shadow: 0 0 8px rgba(195,86,63,0.3);
+    }
+    .login-form button.btn-solid {
+      width: 100%;
+      padding: 15px;
+      background: #C3563F;
+      color: #fff;
+      border: none;
+      border-radius: 30px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .login-form button.btn-solid:hover {
+      background: #a84333;
+    }
+    .extra-links {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .extra-links a {
+      text-decoration: none;
+      color: #C3563F;
+      font-weight: 500;
+    }
+    .or {
+      text-align: center;
+      margin: 20px 0 10px;
+      color: #888;
+      font-size: 0.95rem;
+    }
+    .social-icons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+    .social-icons a img {
+      width: 40px;
+      height: 40px;
+      transition: transform 0.3s;
+    }
+    .social-icons a img:hover {
+      transform: scale(1.1);
+    }
+    /* Responsive */
+    @media (max-width: 768px) {
+      .two-panel-container {
+        flex-direction: column;
+      }
+      .two-panel-left, .two-panel-right {
+        padding: 20px;
+      }
+      .two-panel-left h2 {
+        font-size: 2rem;
+      }
+      .two-panel-left p {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="two-panel-container">
+    <!-- Left Panel -->
+    <div class="two-panel-left">
+      <h2>Welcome Back!</h2>
+      <p>Don't have an account?</p>
+      <a href="{% url 'register' %}" class="btn-outlined">Register</a>
+    </div>
+    <!-- Right Panel -->
+    <div class="two-panel-right">
+      <div class="login-form">
+        <h2>Login</h2>
+        <form method="post">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit" class="btn-solid">Login</button>
+        </form>
+        <div class="extra-links">
+          <!-- Updated Forgot Password URL -->
+          <a href="{% url 'password_reset_request' %}">Forgot Password?</a>
+        </div>
+        <p class="or">or login with</p>
+        <div class="social-icons">
+          <a href="#"><img src="{% static 'images/google.png' %}" alt="Google"></a>
+          <a href="#"><img src="{% static 'images/facebook.png' %}" alt="Facebook"></a>
+          <a href="#"><img src="{% static 'images/github.png' %}" alt="GitHub"></a>
+          <a href="#"><img src="{% static 'images/linkedin.png' %}" alt="LinkedIn"></a>
+        </div>
       </div>
     </div>
   </div>
-</div>
-{% endblock %}
+</body>
+</html>

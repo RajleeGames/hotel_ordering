@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="container mt-5 profile-container">
+  <h1 class="profile-header">Your Profile</h1>
+  <hr class="divider">
+  
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-info alert-sm">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="card profile-card shadow-sm">
+    <div class="card-body">
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <h4 class="section-title">User Info</h4>
+            <div class="form-group">
+              {{ user_form.email.label_tag }}
+              {{ user_form.email }}
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <h4 class="section-title">Profile Info</h4>
+            <div class="form-group">
+              {{ profile_form.phone_number.label_tag }}
+              {{ profile_form.phone_number }}
+            </div>
+            <div class="form-group mt-3">
+              {{ profile_form.profile_picture.label_tag }}
+              {{ profile_form.profile_picture }}
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-update">Update Profile</button>
+      </form>
+    </div>
+  </div>
+
+  <hr class="divider">
+  <h4 class="current-pic-title">Current Profile Picture</h4>
+  <div class="current-pic">
+    {% if user.profile.profile_picture %}
+      <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" class="img-thumbnail">
+    {% else %}
+      <p class="no-pic-text">No profile picture yet.</p>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+  /* Container and Header */
+  .profile-container {
+    max-width: 700px;
+    font-size: 0.85rem;
+  }
+  .profile-header {
+    font-weight: 600;
+    font-size: 1.5rem;
+    text-align: center;
+    color: #333;
+    margin-bottom: 1rem;
+  }
+  .divider {
+    border-top: 1px solid #ddd;
+    margin: 1rem 0;
+  }
+  
+  /* Card Styling */
+  .profile-card {
+    border: none;
+    border-radius: 12px;
+    background: #fff;
+    padding: 1.5rem;
+  }
+  .profile-card .card-body {
+    padding: 0;
+  }
+  
+  /* Section Titles */
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #555;
+  }
+  
+  /* Form Elements */
+  .form-group label {
+    font-size: 0.75rem;
+    color: #777;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    font-size: 0.85rem;
+    padding: 0.4rem;
+    border-radius: 4px;
+  }
+  
+  /* Update Button */
+  .btn-update {
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: background-color 0.3s;
+  }
+  .btn-update:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Current Profile Picture */
+  .current-pic-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #555;
+  }
+  .current-pic img {
+    max-width: 150px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+  }
+  .no-pic-text {
+    font-size: 0.85rem;
+    color: #999;
+  }
+  
+  /* Alerts */
+  .alert-sm {
+    font-size: 0.75rem;
+    padding: 0.5rem;
+  }
+</style>
+{% endblock %}

@@ -1,56 +1,117 @@
 {% extends 'base.html' %}
 {% load custom_filters %}
-
 {% block title %}Your Cart{% endblock %}
+
 {% block content %}
-<h1>Your Cart</h1>
-{% if cart %}
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>Item</th>
-        <th style="width: 200px;">Quantity</th>
-        <th>Price</th>
-        <th>Subtotal</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for item_id, item in cart.items %}
-      <tr>
-        <td>{{ item.name }}</td>
-        
-        <!-- Quantity + / - Buttons -->
-        <td>
-          <div class="d-flex align-items-center">
-            <a href="{% url 'decrement_cart_item' item_id=item_id %}" class="btn btn-sm btn-danger me-2">-</a>
-            <span>{{ item.quantity }}</span>
-            <a href="{% url 'increment_cart_item' item_id=item_id %}" class="btn btn-sm btn-success ms-2">+</a>
-          </div>
-        </td>
-        
-        <td>Tsh{{ item.price }}</td>
-        <td>Tsh{{ item.quantity|multiply:item.price }}</td>
-        
-        <!-- Remove Button -->
-        <td>
-          <a 
-            href="{% url 'remove_from_cart' item_id=item_id %}" 
-            class="btn btn-sm btn-outline-danger"
-          >
-            Remove
-          </a>
-        </td>
-      </tr>
-      {% endfor %}
-      <tr>
-        <td colspan="3" class="text-end"><strong>Total:</strong></td>
-        <td colspan="2"><strong>Tsh{{ total }}</strong></td>
-      </tr>
-    </tbody>
-  </table>
-  <a href="{% url 'checkout' %}" class="btn btn-success">Proceed to Checkout</a>
-{% else %}
-  <p>Your cart is empty.</p>
-{% endif %}
+<style>
+  /* Container Card Styling */
+  .cart-container {
+    background-color: #f7f7f7;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    font-size: 0.85rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  .cart-title {
+    text-align: center;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+  }
+  /* Table Styling */
+  .cart-table th, .cart-table td {
+    vertical-align: middle !important;
+    padding: 0.75rem;
+  }
+  .cart-table th {
+    background: linear-gradient(135deg, #ff6600, #ff9933);
+    color: #fff;
+    font-size: 0.85rem;
+  }
+  .cart-table td {
+    font-size: 0.8rem;
+    color: #555;
+  }
+  /* Action Buttons & Quantity Controls */
+  .action-btn {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+  }
+  .quantity-control a {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+  /* Checkout Button */
+  .checkout-btn {
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+  }
+  /* Responsive adjustments */
+  @media (max-width: 576px) {
+    .cart-table th, .cart-table td {
+      font-size: 0.75rem;
+      padding: 0.5rem;
+    }
+    .cart-title {
+      font-size: 1.25rem;
+    }
+  }
+</style>
+
+<div class="container my-5">
+  <div class="cart-container">
+    <h1 class="cart-title">Your Cart</h1>
+    {% if cart %}
+    <div class="table-responsive">
+      <table class="table cart-table table-striped">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th style="width: 200px;">Quantity</th>
+            <th>Price</th>
+            <th>Subtotal</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item_id, item in cart.items %}
+          <tr>
+            <td>{{ item.name }}</td>
+            <td>
+              <div class="d-flex align-items-center quantity-control">
+                <a href="{% url 'decrement_cart_item' item_id=item_id %}" class="btn btn-sm btn-danger me-2 action-btn">-</a>
+                <span>{{ item.quantity }}</span>
+                <a href="{% url 'increment_cart_item' item_id=item_id %}" class="btn btn-sm btn-success ms-2 action-btn">+</a>
+              </div>
+            </td>
+            <td>Tsh{{ item.price }}</td>
+            <td>Tsh{{ item.quantity|multiply:item.price }}</td>
+            <td>
+              <a href="{% url 'remove_from_cart' item_id=item_id %}" class="btn btn-sm btn-outline-danger action-btn" title="Remove">
+                <i class="bi bi-trash"></i>
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+          <tr>
+            <td colspan="3" class="text-end"><strong>Total:</strong></td>
+            <td colspan="2"><strong>Tsh{{ total }}</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="text-end">
+      <a href="{% url 'checkout' %}" class="btn btn-success checkout-btn">
+        Proceed to Checkout
+      </a>
+    </div>
+    {% else %}
+    <p class="text-center">Your cart is empty.</p>
+    {% endif %}
+  </div>
+</div>
 {% endblock %}

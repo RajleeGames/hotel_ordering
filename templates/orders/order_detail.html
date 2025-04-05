@@ -1,0 +1,318 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+{% load mathfilters %}  {# Only needed if you perform arithmetic operations #}
+
+{% block title %}Track Your Order{% endblock %}
+
+{% block content %}
+<style>
+  /* Container */
+  .track-order-container {
+    max-width: 600px;
+    margin: 1.5rem auto;
+    padding: 1rem;
+    font-family: 'Poppins', sans-serif;
+    color: #333;
+  }
+  /* Top Bar (Order ID, Time Ago, Status, Close) */
+  .track-order-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  .order-id {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #007bff;
+  }
+  .time-ago {
+    font-size: 0.8rem;
+    color: #999;
+    margin-left: 0.5rem;
+  }
+  .order-status {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #fff;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    margin-right: auto;
+    margin-left: 1rem;
+  }
+  .order-status.complete {
+    background-color: #28a745;
+  }
+  .order-status.cancelled {
+    background-color: #dc3545;
+  }
+  .order-status.in-progress {
+    background-color: #ffc107;
+    color: #333;
+  }
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #333;
+    text-decoration: none;
+  }
+  /* Assigned Dropper Title */
+  .assigned-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  /* Driver Row: Horizontal Layout */
+  .driver-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  .driver-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .driver-info {
+    display: flex;
+    flex-direction: column;
+  }
+  .driver-name {
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+  }
+  .driver-phone {
+    font-size: 0.85rem;
+    color: #555;
+  }
+  .driver-call {
+    margin-left: auto;
+    background-color: #25D366;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+  }
+  .driver-call i {
+    color: #fff;
+    font-size: 1.2rem;
+  }
+  /* Order Collection List */
+  .collection-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  .collection-card {
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+  }
+  .restaurant-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .restaurant-logo {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    object-fit: cover;
+  }
+  /* Food Items Row: Horizontal Layout */
+  .food-item-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+    justify-content: flex-start;
+  }
+  .food-item-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 6px;
+    object-fit: cover;
+  }
+  .food-item-details {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+  }
+  .food-name {
+    font-weight: 500;
+    color: #333;
+  }
+  .food-qty-price {
+    color: #555;
+    font-size: 0.9rem;
+  }
+  .food-total {
+    text-align: right;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+    color: #333;
+  }
+  /* Order Extra Info */
+  .order-extra-info {
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    padding: 1rem;
+  }
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    margin-bottom: 0.4rem;
+  }
+  .info-label {
+    color: #555;
+  }
+  .info-value {
+    font-weight: 500;
+    color: #333;
+  }
+  .to-be-paid {
+    text-align: right;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #e74c3c;
+    margin-top: 0.5rem;
+  }
+  /* Responsive Adjustments */
+  @media (max-width: 576px) {
+    .driver-row {
+      /* Keep driver row horizontal on mobile */
+      flex-wrap: nowrap;
+    }
+    .food-item-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.2rem;
+    }
+    .info-row {
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+    .to-be-paid {
+      text-align: left;
+      margin-top: 0.8rem;
+    }
+  }
+</style>
+
+<div class="container track-order-container">
+  <!-- Top Bar -->
+  <div class="track-order-topbar">
+    <div>
+      <span class="order-id">#{{ order.id }}</span>
+      <span class="time-ago">{{ order.created_at|timesince }} ago</span>
+      {% if order.status == "completed" %}
+        <span class="order-status complete">complete</span>
+      {% elif order.status == "cancelled" %}
+        <span class="order-status cancelled">cancelled</span>
+      {% elif order.status == "in progress" or order.status == "in_progress" %}
+        <span class="order-status in-progress">in progress</span>
+      {% endif %}
+    </div>
+    <a href="{% url 'my_orders' %}" class="close-btn" aria-label="Close">&times;</a>
+  </div>
+
+  <!-- Assigned Dropper Title -->
+  {% if driver %}
+    <div class="assigned-title">Assigned Dropper</div>
+    <!-- Driver Row: Horizontal Layout -->
+    <div class="driver-row">
+      {% if driver.image %}
+        <img src="{{ driver.image.url }}" alt="Driver" class="driver-img">
+      {% else %}
+        <img src="{% static 'images/default_driver.png' %}" alt="Driver" class="driver-img">
+      {% endif %}
+      <div class="driver-info">
+        <span class="driver-name">{{ driver.name }}</span>
+        <span class="driver-phone">{{ driver.phone }}</span>
+      </div>
+      <a href="tel:{{ driver.phone }}" class="driver-call">
+        <i class="fa fa-phone"></i>
+      </a>
+    </div>
+  {% else %}
+    <p>No default driver is set.</p>
+  {% endif %}
+
+  <!-- Order Collection List -->
+  <div class="collection-title">Order Collection List</div>
+  <div class="collection-card">
+    <div class="restaurant-name">
+      {% if restaurant_logo_url %}
+        <img src="{{ restaurant_logo_url }}" alt="Logo" class="restaurant-logo">
+      {% endif %}
+      {{ order.restaurant_name|default_if_none:"IQRAAM" }}
+    </div>
+
+    <!-- Loop through items and display them -->
+    {% for item in order.items.all %}
+      <div class="food-item-row">
+        {% if item.food_item.image %}
+          <img src="{{ item.food_item.image.url }}" alt="{{ item.food_item.name }}" class="food-item-img">
+        {% else %}
+          <img src="{% static 'images/no_food.png' %}" alt="{{ item.food_item.name }}" class="food-item-img">
+        {% endif %}
+        <div class="food-item-details">
+          <span class="food-name">{{ item.food_item.name }}</span>
+          <span class="food-qty-price">
+            {{ item.quantity }} @ TZS {{ item.price|floatformat:0 }}
+          </span>
+        </div>
+      </div>
+    {% endfor %}
+
+    <div class="food-total">
+      Food Items Total: TZS {{ items_total|floatformat:0 }}
+    </div>
+  </div>
+
+  <!-- Extra Info: Distance, Delivery Fee, etc. -->
+  <div class="order-extra-info">
+    <div class="info-row">
+      <div class="info-label">Distance</div>
+      <div class="info-value">{{ order.distance|default_if_none:"nullkm" }}</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">Delivery Time</div>
+      <div class="info-value">{{ order.delivery_time|default_if_none:"-" }}</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">Package</div>
+      <div class="info-value">{{ order.package_type|default_if_none:"Premium Delivery" }}</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">Delivery Fee</div>
+      <div class="info-value">TZS 1000</div>
+    </div>
+    <div class="to-be-paid">
+      TO BE PAID: TZS {{ items_total|add:"1000"|floatformat:0 }}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- Removed map-related scripts -->
+{% endblock extra_scripts %}

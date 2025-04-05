@@ -24,7 +24,7 @@ class SignUpForm(UserCreationForm):
         fields = ['username', 'email', 'phone_number', 'profile_picture', 'password1']
         widgets = {
             'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'}),
-            'password1': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}),
+            'password1': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password1'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -32,6 +32,100 @@ class SignUpForm(UserCreationForm):
         # Remove help texts for all fields
         for field in self.fields.values():
             field.help_text = ""
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+           
+          
+          
+          
+           
         # Remove the password2 field if it exists
         if 'password2' in self.fields:
             self.fields.pop('password2')
@@ -55,3 +149,24 @@ class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ['phone_number', 'profile_picture']
+
+
+class PasswordResetEmailForm(forms.Form):
+    email = forms.EmailField(label="Email", max_length=254)
+
+class PasswordResetCodeForm(forms.Form):
+    email = forms.EmailField(label="Email", max_length=254)
+    code = forms.CharField(label="Verification Code", max_length=6)
+
+class SetNewPasswordForm(forms.Form):
+    email = forms.EmailField(widget=forms.HiddenInput())  # hidden email field
+    new_password = forms.CharField(label="New Password", widget=forms.PasswordInput)
+    confirm_password = forms.CharField(label="Confirm Password", widget=forms.PasswordInput)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        p1 = cleaned_data.get("new_password")
+        p2 = cleaned_data.get("confirm_password")
+        if p1 and p2 and p1 != p2:
+            raise forms.ValidationError("Passwords do not match.")
+        return cleaned_data

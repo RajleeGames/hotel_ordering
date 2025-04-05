@@ -77,3 +77,8 @@ def toggle_favorite(request, item_id):
 
 def customer_support_view(request):
     return render(request, 'customer_support.html')
+
+
+@login_required
+def profile_view(request):
+    return render(request, "profile_site.html")
