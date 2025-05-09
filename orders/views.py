@@ -119,11 +119,6 @@ def view_cart(request):
 
 
 def checkout(request):
-    """
-    Checkout view that handles coupon code processing,
-    creates an Order and corresponding OrderItems, applies discount,
-    adds a fixed delivery fee (TZS 1000), and then clears the cart.
-    """
     cart = request.session.get('cart', {})
     if not cart:
         messages.warning(request, "Your cart is empty.")
@@ -145,7 +140,6 @@ def checkout(request):
         order = Order.objects.create(user=request.user)
         subtotal = 0
 
-        # Create OrderItem for each item in the cart.
         for item_id, item_data in cart.items():
             food_item = get_object_or_404(FoodItem, pk=int(item_id))
             line_price = float(item_data['price']) * item_data['quantity']
@@ -158,26 +152,23 @@ def checkout(request):
                 price=float(item_data['price'])
             )
 
-        # Apply discount if any.
         net_total = subtotal - float(discount_amount)
-        gross_total = net_total + delivery_fee  # Add fixed delivery fee
+        gross_total = net_total + delivery_fee
 
         order.total_price = gross_total if gross_total > 0 else 0
-        # Optionally, store subtotal and delivery fee on the order if your model supports these fields.
-        # order.subtotal = subtotal
-        # order.delivery_fee = delivery_fee
         order.save()
 
         # Clear the cart.
         request.session['cart'] = {}
         messages.success(request, "Your order has been placed!")
-        return redirect('order_confirmation', order_id=order.id)
-
-    # For GET requests, calculate the subtotal from the cart
+        
+        # Redirect to the Pesapal payment view, passing the order ID.
+        return redirect('pay_order', order_id=order.id)
+    
+    # GET: show checkout page with summary details.
     subtotal = sum(float(item['price']) * item['quantity'] for item in cart.values())
-    net_total = subtotal  # No discount applied for GET
+    net_total = subtotal
     gross_total = net_total + delivery_fee
-
     context = {
         'cart': cart,
         'subtotal': subtotal,
@@ -185,6 +176,7 @@ def checkout(request):
         'gross_total': gross_total,
     }
     return render(request, 'orders/checkout.html', context)
+
 
 
 def order_confirmation(request, order_id):

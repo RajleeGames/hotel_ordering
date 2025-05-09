@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-import os 
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,8 +23,13 @@ SECRET_KEY = 'django-insecure-$dlyy%#*q-76h=)3qntztl3et2!&7$mx_3e1zm+-=(6ieuo7#=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True 
 
-# Updated ALLOWED_HOSTS to support ngrok
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'ltd-threaded-trusts-ukraine.trycloudflare.com']
+# Updated ALLOWED_HOSTS to support local dev + tunneling (Cloudflare/Ngrok).
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '172.16.40.235',
+    'expanding-concentration-mas-newer.trycloudflare.com',
+]
 
 # Application definition
 INSTALLED_APPS = [
@@ -34,13 +39,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'accounts.apps.AccountsConfig', # For user management
+    'accounts.apps.AccountsConfig',  # For user management
     'menu',      # For the food menu
     'orders',    # For order processing and tracking
     'mathfilters',
     'rest_framework',
     'reviews',
     'notifications',
+    'payments',
 ]
 
 MIDDLEWARE = [
@@ -105,11 +111,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'Africa/Dar_es_Salaam'
-
 USE_I18N = True
-
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
@@ -128,9 +131,11 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Stripe configuration (update with your own keys)
 STRIPE_PUBLIC_KEY = 'your-public-key'
 STRIPE_SECRET_KEY = 'your-secret-key'
 
+# Django REST Framework configuration
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
@@ -141,30 +146,23 @@ REST_FRAMEWORK = {
     ],
 }
 
-# settings.py
-
-USE_I18N = True
-USE_L10N = True
-USE_TZ = True
-
+# Internationalization additional settings
 LANGUAGE_CODE = 'en'
-
 LANGUAGES = [
     ('en', 'English'),
     ('sw', 'Swahili'),
     # add other languages if needed
 ]
-
 LOCALE_PATHS = [
     BASE_DIR / 'locale',  # or your locale folder path
 ]
 
-
+# CSRF trusted origins
 CSRF_TRUSTED_ORIGINS = [
-     "https://ltd-threaded-trusts-ukraine.trycloudflare.com",
+    "https://expanding-concentration-mas-newer.trycloudflare.com",
 ]
 
-
+# Email configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
@@ -173,8 +171,22 @@ EMAIL_HOST_USER = 'hajraally499@gmail.com'
 EMAIL_HOST_PASSWORD = 'dcxokvxeoydjknwf'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-
-
-
+# ClickPesa API configuration (example, for other integrations)
 CLICKPESA_API_KEY = os.environ.get("CLICKPESA_API_KEY", "SKB1jnjsVI4EZekMa3zzcdfQp7nGp7ZER9Plbv3Gnd")
 CLICKPESA_CLIENT_ID = os.environ.get("CLICKPESA_CLIENT_ID", "IDCkKJSf613UpykdzCI9iBUHFWA0wzgk")
+
+# --------------------------------------------------------------------
+#  P E S A P A L   C O N F I G U R A T I O N
+# --------------------------------------------------------------------
+PESAPAL_CONSUMER_KEY = "ngW+UEcnDhltUc5fxPfrCD987xMh3Lx8"
+PESAPAL_CONSUMER_SECRET = "q27RChYs5UkypdcNYKzuUw460Dg="
+PESAPAL_API_URL = "https://cybqa.pesapal.com/pesapalv3"
+         # Pesapal sandbox endpoint
+
+# Use the local server endpoint for development; override for production.
+if DEBUG:
+    PESAPAL_CALLBACK_URL = "http://127.0.0.1:8000/payment_callback/"
+else:
+    PESAPAL_CALLBACK_URL = "https://expanding-concentration-mas-newer.trycloudflare.com/payment_callback/"
+
+PESAPAL_NOTIFICATION_ID = "your-actual-notification-id-here"      # Replace with your actual Notification ID from your Pesapal dashboard
