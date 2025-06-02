@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="text-xl font-semibold mb-4">Complete Your Payment</h2>
+
+<form id="payment-form" method="post" action="{% url 'process_payment' order.id %}">
+  {% csrf_token %}
+  <input type="hidden" name="payment_type" id="payment_type" value="stripe" />
+  <input type="hidden" name="stripeToken" id="stripeToken" />
+
+  <!-- Stripe Card Input -->
+  <div id="card-element" class="mb-4 border p-3 rounded"></div>
+
+  <!-- Buttons -->
+  <div class="flex gap-4">
+    <button type="button" onclick="chooseCash()" class="bg-gray-700 text-white px-4 py-2 rounded">
+      Pay Cash on Delivery
+    </button>
+    <button type="submit" id="stripe-button" class="bg-indigo-600 text-white px-4 py-2 rounded">
+      Pay with Card
+    </button>
+  </div>
+</form>
+
+<!-- Stripe JS -->
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+  const stripe = Stripe("{{ stripe_public_key }}");  // This must be passed from your Django view
+  const elements = stripe.elements();
+  const card = elements.create("card");
+  card.mount("#card-element");
+
+  // Handle cash selection
+  function chooseCash() {
+    document.getElementById("payment_type").value = "cash";
+    document.getElementById("payment-form").submit();
+  }
+
+  // Handle Stripe tokenization
+  const form = document.getElementById("payment-form");
+  form.addEventListener("submit", async (e) => {
+    if (document.getElementById("payment_type").value !== "stripe") return;
+
+    e.preventDefault();
+    const {token, error} = await stripe.createToken(card);
+    if (error) {
+      alert(error.message);
+    } else {
+      document.getElementById("stripeToken").value = token.id;
+      form.submit();
+    }
+  });
+</script>
+{% endblock %}

@@ -1,6 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:webview_flutter/webview_flutter.dart';
 
 void main() {
   runApp(const MyApp());
@@ -8,71 +8,83 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Hotel Ordering',
-      theme: ThemeData(primarySwatch: Colors.green),
-      home: const HomePage(),
+      debugShowCheckedModeBanner: false, // hide DEBUG badge
+      theme: ThemeData(
+        primarySwatch: Colors.purple,
+        scaffoldBackgroundColor: const Color(0xFFFFF5FF),
+      ),
+      home: const MenuWebViewPage(),
     );
   }
 }
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
-
+class MenuWebViewPage extends StatefulWidget {
+  const MenuWebViewPage({super.key});
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<MenuWebViewPage> createState() => _MenuWebViewPageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  List _items = [];
-  bool _loading = true;
+class _MenuWebViewPageState extends State<MenuWebViewPage> {
+  late final WebViewController _controller;
+  bool _isLoading = true;
+  String _pageTitle = '';
+
+  static const String emulatorUrl = 'http://10.0.2.2:8000/menu/';
 
   @override
   void initState() {
     super.initState();
-    _fetchItems();
-  }
 
-  Future<void> _fetchItems() async {
-    final resp = await http.get(
-      // Pointing to your local Django server on the LAN
-      Uri.parse('http://172.16.40.235:8000/api/food-items/'),
-    );
-    if (resp.statusCode == 200) {
-      setState(() {
-        _items = json.decode(resp.body);
-        _loading = false;
-      });
-    } else {
-      // Handle error or show a message
-      setState(() {
-        _loading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load menu: ${resp.statusCode}')),
-      );
-    }
+    _controller =
+        WebViewController()
+          ..setJavaScriptMode(JavaScriptMode.unrestricted)
+          ..setNavigationDelegate(
+            NavigationDelegate(
+              onPageStarted: (_) => setState(() => _isLoading = true),
+              onPageFinished: (_) async {
+                final title = await _controller.getTitle();
+                setState(() {
+                  _isLoading = false;
+                  _pageTitle = title ?? '';
+                });
+              },
+            ),
+          )
+          ..loadRequest(Uri.parse(emulatorUrl));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Menu')),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: _items.length,
-              itemBuilder: (_, i) {
-                final item = _items[i];
-                return ListTile(
-                  title: Text(item['name'] ?? 'Unnamed'),
-                  subtitle: Text('Tsh ${item['price'] ?? '0'}'),
-                );
-              },
+      appBar: AppBar(
+        // always show the real <title> from your Django page (or blank until it's loaded)
+        title: Text(_pageTitle),
+        elevation: 0,
+        actions: [
+          if (_isLoading)
+            const Padding(
+              padding: EdgeInsets.only(right: 16),
+              child: Center(
+                child: SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2,
+                  ),
+                ),
+              ),
             ),
+        ],
+      ),
+      body:
+          kIsWeb
+              ? const Center(child: Text('WebView is only supported on mobile'))
+              : WebViewWidget(controller: _controller),
     );
   }
 }

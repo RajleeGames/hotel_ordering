@@ -6,34 +6,38 @@ from datetime import date, timedelta
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 import stripe
-
+from django.views.decorators.http import require_http_methods
 from .models import Order, OrderItem, Coupon, Driver
 from menu.models import FoodItem
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
-def process_payment(request):
+
+
+def process_payment(request, order_id):
     """
     Process Stripe payment.
     """
+    order = get_object_or_404(Order, id=order_id)
+
     if request.method == 'POST':
         token = request.POST.get('stripeToken')
-        amount = int(float(request.POST.get('amount')) * 100)  # Convert to cents
+        amount = int(order.total_price * 100)  # Convert to cents
         try:
             stripe.Charge.create(
                 amount=amount,
                 currency='usd',
-                description='Hotel Order Payment',
+                description=f'Hotel Order #{order.id}',
                 source=token,
             )
             messages.success(request, "Payment successful!")
-            # Adjust if you need to pass a specific order_id here.
-            return redirect('order_confirmation')
+            return redirect('order_confirmation', order_id=order.id)
         except stripe.error.CardError as e:
             messages.error(request, f"Payment error: {e}")
             return redirect('checkout')
-    return render(request, 'orders/payment.html')
+    return render(request, 'orders/payment.html', {'order': order})
+
 
 
 def add_to_cart(request, item_id):
@@ -163,7 +167,8 @@ def checkout(request):
         messages.success(request, "Your order has been placed!")
         
         # Redirect to the Pesapal payment view, passing the order ID.
-        return redirect('pay_order', order_id=order.id)
+        return redirect('process_payment', order_id=order.id)
+
     
     # GET: show checkout page with summary details.
     subtotal = sum(float(item['price']) * item['quantity'] for item in cart.values())
@@ -303,3 +308,44 @@ def order_detail(request, order_id):
         'items_total': items_total,
         'driver': driver,
     })
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def pay_order(request, order_id):
+    order = get_object_or_404(Order, pk=order_id, user=request.user)
+
+    # If they submitted the form (Stripe _or_ cash), mark paid and show confirmation.
+    if request.method == "POST":
+        payment_type = request.POST.get("payment_type", "stripe")
+        if payment_type == "cash":
+            # mark order paid for cash, or whatever logic you need
+            order.status = "paid"
+            order.save()
+            messages.success(request, "Order placed. Please pay cash on delivery.")
+        else:
+            # existing Stripe logic...
+            token = request.POST.get("stripeToken")
+            amount = int(order.total_price * 100)
+            try:
+                stripe.Charge.create(
+                  amount=amount,
+                  currency="usd",
+                  description=f"Order #{order.id}",
+                  source=token,
+                )
+                order.status = "paid"
+                order.save()
+                messages.success(request, "Payment successful!")
+            except stripe.error.CardError as e:
+                messages.error(request, e.user_message or "Payment failed.")
+                # fall through to re-render form
+
+        return render(request, "payments/confirmation.html", { "order": order })
+
+    # GET → show the pay_order form with both Stripe _and_ Cash buttons
+    return render(request, "payments/pay_order.html", {
+      "order": order,
+      "stripe_public_key": settings.STRIPE_PUBLIC_KEY,
+    })
+

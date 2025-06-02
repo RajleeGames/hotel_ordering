@@ -21,14 +21,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-$dlyy%#*q-76h=)3qntztl3et2!&7$mx_3e1zm+-=(6ieuo7#='
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True 
+DEBUG = False
 
 # Updated ALLOWED_HOSTS to support local dev + tunneling (Cloudflare/Ngrok).
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    '172.16.40.235',
-    'expanding-concentration-mas-newer.trycloudflare.com',
+    '100.70.132.92',
+    'taifafood.chuihardware.com',
+    'www.chuihardware.com',
+    '31.97.52.238',
+    '10.0.2.2',
 ]
 
 # Application definition
@@ -40,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'accounts.apps.AccountsConfig',  # For user management
+    'corsheaders',
     'menu',      # For the food menu
     'orders',    # For order processing and tracking
     'mathfilters',
@@ -58,6 +62,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', 
 ]
 
 ROOT_URLCONF = 'hotel_ordering.urls'
@@ -119,13 +125,21 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 STATIC_URL = '/static/'
 
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 # Add static and media files handling
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -190,3 +204,8 @@ else:
     PESAPAL_CALLBACK_URL = "https://expanding-concentration-mas-newer.trycloudflare.com/payment_callback/"
 
 PESAPAL_NOTIFICATION_ID = "your-actual-notification-id-here"      # Replace with your actual Notification ID from your Pesapal dashboard
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+STRIPE_PUBLISHABLE_KEY = "pk_test_..."  # Your real key from Stripe
+STRIPE_SECRET_KEY = "sk_test_..."

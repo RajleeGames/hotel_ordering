@@ -18,3 +18,5 @@ db.sqlite3
 *.pyo
 *.pyd
 migrations/__pycache__/
+
+staticfiles/

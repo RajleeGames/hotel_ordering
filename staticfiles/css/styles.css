@@ -1,0 +1,511 @@
+/* =======================================================
+   Fancy CSS for Hotel Ordering (Smaller Two-Panel Layout)
+   Adds glowing inputs, neon buttons, slide animations, etc.
+   + Two-Panel Layout for Login/Register
+   + Two-column grid for form fields
+======================================================= */
+
+/* Import Custom Fonts (Optional) */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&family=Roboto:wght@400;500&display=swap');
+
+/* -------------------------------------------------------
+   Root Colors & Variables
+------------------------------------------------------- */
+:root {
+    --primary-color: #007bff;
+    --primary-dark: #0056b3;
+    --success-color: #28a745;
+    --success-dark: #1e7e34;
+    --dark-color: #343a40;
+    --light-bg: #f8f9fa;
+    --font-body: 'Roboto', sans-serif;
+    --font-heading: 'Montserrat', sans-serif;
+}
+
+/* -------------------------------------------------------
+   Global Resets & Base Styles
+------------------------------------------------------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(135deg, var(--light-bg), #e2e9f0);
+    font-family: var(--font-body);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding-top: 60px;
+    color: #333;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+    font-family: var(--font-heading);
+    color: var(--dark-color);
+}
+
+/* -------------------------------------------------------
+   Containers & Navbar
+------------------------------------------------------- */
+.container {
+    margin-bottom: 40px;
+}
+
+.navbar {
+    transition: background 0.3s ease;
+}
+
+.navbar:hover {
+    background: white;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+}
+
+.navbar-nav .nav-link {
+    font-size: 1.2rem;
+    padding: 10px 15px;
+    transition: color 0.2s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    color: whitesmoke;
+}
+
+/* -------------------------------------------------------
+   Footer
+------------------------------------------------------- */
+footer {
+    background-color: var(--dark-color);
+    color: #f8f9fa;
+    text-align: center;
+    padding: 15px;
+    margin-top: auto;
+    width: 100%;
+    font-size: 0.9rem;
+}
+
+/* -------------------------------------------------------
+   Cards (Used in Menu/Cart/Etc.)
+------------------------------------------------------- */
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.card-header {
+    background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
+    color: #fff;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    font-family: var(--font-heading);
+    font-weight: 500;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* -------------------------------------------------------
+   Fancy Form Container (Optional)
+   For single-panel forms with .fancy-form & .slide-in
+------------------------------------------------------- */
+.fancy-form {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Slide-In Animation */
+.slide-in {
+    animation: slideInFromLeft 0.8s ease-out forwards;
+    opacity: 0;
+}
+
+@keyframes slideInFromLeft {
+    0% {
+        transform: translateX(-50%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Glow on Form Inputs */
+form {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-control {
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    outline: none;
+}
+
+/* -------------------------------------------------------
+   Buttons
+------------------------------------------------------- */
+.btn-primary {
+    background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
+    border: none;
+    border-radius: 8px;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-primary:hover {
+    transform: scale(1.03);
+    background: linear-gradient(45deg, var(--primary-dark), var(--primary-color));
+}
+
+.btn-success {
+    background: linear-gradient(45deg, var(--success-color), var(--success-dark));
+    border: none;
+    border-radius: 8px;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-success:hover {
+    transform: scale(1.03);
+    background: linear-gradient(45deg, var(--success-dark), var(--success-color));
+}
+
+.btn-outline-danger {
+    border-radius: 8px;
+    transition: transform 0.2s ease;
+}
+
+.btn-outline-danger:hover {
+    transform: scale(1.05);
+}
+
+/* Neon Glow Animation for Buttons */
+@keyframes neonGlow {
+    0%,
+    100% {
+        text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px var(--primary-color), 0 0 20px var(--primary-color), 0 0 25px var(--primary-color);
+    }
+    50% {
+        text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px var(--primary-color), 0 0 40px var(--primary-color), 0 0 50px var(--primary-color);
+    }
+}
+
+.btn-solid {
+    background: #4C9FFF;
+    color: #fff;
+    padding: 8px;
+    border: none;
+    border-radius: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-solid:hover {
+    background: #247cd4;
+    transform: scale(1.02);
+    animation: neonGlow 1s ease-in-out infinite alternate;
+}
+
+/* -------------------------------------------------------
+   Tables (Used in Cart/Manage Orders)
+------------------------------------------------------- */
+.table {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.table thead {
+    background: var(--dark-color);
+    color: #ffffff;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f2f2f2;
+}
+
+/* -------------------------------------------------------
+   Two-Panel Layout for Login/Register
+   Using .two-panel-container, .two-panel-left, .two-panel-right
+------------------------------------------------------- */
+.two-panel-container {
+    width: 800px;
+    min-height: 400px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 0 20px #4ECDC4, 0 0 40px #349090;
+    animation: glow-border 1.5s infinite alternate;
+    display: flex;
+    overflow: hidden;
+    margin: 20px auto;
+}
+
+.two-panel-left {
+    flex: 1;
+    background: #4C9FFF;
+    color: #fff;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+    clip-path: polygon(0 0, 65% 0, 100% 100%, 0 100%);
+}
+
+.two-panel-left h2 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+}
+
+.two-panel-left p {
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+}
+
+.btn-outlined {
+    padding: 8px 16px;
+    color: #fff;
+    border: 2px solid #fff;
+    border-radius: 20px;
+    text-decoration: none;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.btn-outlined:hover {
+    background: #fff;
+    color: #4C9FFF;
+}
+
+.two-panel-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+}
+
+.two-panel-right .login-form {
+    width: 80%;
+    max-width: 300px;
+}
+
+.two-panel-right .login-form h2 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.two-panel-right .login-form form {
+    display: flex;
+    flex-direction: column;
+}
+
+.two-panel-right .login-form input[type="text"],
+.two-panel-right .login-form input[type="password"],
+.two-panel-right .login-form input[type="email"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 12px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    outline: none;
+    transition: border 0.3s ease;
+}
+
+.two-panel-right .login-form input[type="text"]:focus,
+.two-panel-right .login-form input[type="password"]:focus,
+.two-panel-right .login-form input[type="email"]:focus {
+    border-color: #4C9FFF;
+}
+
+.extra-links {
+    text-align: right;
+    margin-bottom: 10px;
+}
+
+.extra-links a {
+    color: #666;
+    font-size: 0.85rem;
+    text-decoration: none;
+}
+
+.extra-links a:hover {
+    text-decoration: underline;
+}
+
+.or {
+    margin: 10px 0;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #777;
+}
+
+.social-icons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.social-icons a {
+    width: 30px;
+    height: 30px;
+    display: inline-block;
+}
+
+.social-icons img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+/* -------------------------------------------------------
+   Two-Column Grid for Registration Fields
+------------------------------------------------------- */
+.two-column-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.mt-3 {
+    margin-top: 1rem;
+}
+
+/* -------------------------------------------------------
+   Mobile Responsive Adjustments
+------------------------------------------------------- */
+@media screen and (max-width: 768px) {
+    body {
+        padding-top: 20px;
+    }
+
+    .two-panel-container {
+        width: 100%;
+        flex-direction: column;
+        border-radius: 0;
+        margin: 0 auto;
+    }
+
+    .two-panel-left,
+    .two-panel-right {
+        width: 100%;
+        padding: 20px;
+        border-radius: 0;
+        clip-path: none;
+    }
+
+    .navbar-nav .nav-link {
+        padding: 10px 10px;
+        font-size: 0.9rem;
+    }
+
+    .card-img-top {
+        height: 150px;
+    }
+
+    .social-icons a {
+        width: 25px;
+        height: 25px;
+    }
+
+    /* Responsive table for Manage Orders */
+    .table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
+
+
+  /* Example: Force the "Good morning" to be bold and larger if you want */
+.offcanvas-header h6 {
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+  
+  /* Example: Make the arrow icon slightly bigger or add spacing */
+  .offcanvas-header .fa-arrow-left {
+    margin-right: 10px;
+  }
+  
+  /* Example: Adjust the login button style */
+  .offcanvas-header .btn-outline-light {
+    border: 2px solid #fff;
+    font-weight: 600;
+  }
+  
+  /* You can also style the brand name in the navbar */
+  .navbar-brand {
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+  
+  @media (max-width: 991px) {
+    #sidebarMenu.offcanvas-partial {
+      width: 90% !important;
+    }
+  }
+  
+
+  
